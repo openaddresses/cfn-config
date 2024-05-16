@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file. For change log formatting, see http://keepachangelog.com/
 
+## 7.3.0 - 2024-05-16
+- :arrow_up: Update to latest deps
+- :tada: Internal support for Cloudformation Descriptions
+- :rocket: Update to Flat ESLint Config
+- :rocket: Use AWS Cloudformation types where possible
+
 ## 7.2.0 - 2024-04-18
 - :arrow_up: Update to latest deps
 

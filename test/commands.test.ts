@@ -1,17 +1,11 @@
 /* eslint-disable no-console */
 /* eslint-disable no-useless-escape */
-import path from 'path';
 import test from 'tape';
 import Sinon from 'sinon';
 import {
     Commands,
-    CommandContext,
-    Operations
 } from '../lib/commands.js';
-import Prompt from '../lib/prompt.js';
-import Actions from '../lib/actions.js';
 import Lookup from '../lib/lookup.js';
-import Template from '../lib/template.js';
 
 const opts = {
     name: 'my-stack',

@@ -10,6 +10,8 @@ import {
     Tag,
     Change,
     Parameter,
+    Capability,
+    ChangeSetType,
     CloudFormationClient,
     CreateChangeSetCommand,
     CreateChangeSetCommandInput,
@@ -94,9 +96,9 @@ export default class Actions {
      * @param Tags - Tags to be applied to all resources in the stack
      * @param expand - Set CAPABILITY_AUTO_EXPAND
      */
-    async diff(name: string, changeSetType: string, templateUrl: string, parameters: Parameter[], tags: Tag[], expand = false): Promise<ChangeSetDetail> {
+    async diff(name: string, desc: string, changeSetType: ChangeSetType, templateUrl: string, parameters: Parameter[], tags: Tag[], expand = false): Promise<ChangeSetDetail> {
         const cfn = new CloudFormationClient(this.client);
-        const changeSetParameters = changeSet(name, changeSetType, templateUrl, parameters, expand, tags);
+        const changeSetParameters = changeSet(name, desc, changeSetType, templateUrl, parameters, expand, tags);
 
         try {
             await cfn.send(new CreateChangeSetCommand(changeSetParameters));
@@ -396,25 +398,30 @@ function sleep(ms: number): Promise<undefined> {
  */
 function changeSet(
     StackName: string,
-    ChangeSetType: string,
+    Description: string,
+    ChangeSetType: ChangeSetType,
     TemplateURL: string,
     Parameters: Parameter[],
     expand: boolean,
-    Tags: Tag[] =[]
+    Tags: Tag[] = []
 ): CreateChangeSetCommandInput {
     const ChangeSetName = 'a' + crypto.randomBytes(16).toString('hex');
 
-    const base = {
+    const base: CreateChangeSetCommandInput = {
         StackName,
         ChangeSetName,
-        Capabilities: ['CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM'],
+        Capabilities: [
+            Capability.CAPABILITY_IAM,
+            Capability.CAPABILITY_NAMED_IAM
+        ],
         ChangeSetType,
         TemplateURL,
         Parameters,
+        Description,
         Tags
     };
 
-    if (expand) base.Capabilities.push('CAPABILITY_AUTO_EXPAND');
+    if (expand) base.Capabilities.push(Capability.CAPABILITY_AUTO_EXPAND);
 
     return base;
 }

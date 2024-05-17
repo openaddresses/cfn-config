@@ -26,7 +26,7 @@ export default class CFNConfig {
 
     constructor(client: CFNConfigClient, options: CommandOptions = {}) {
         this.client = client;
- 
+
         if (!options) options = {};
 
         this.actions = new Actions(this.client);

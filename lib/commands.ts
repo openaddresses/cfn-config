@@ -436,6 +436,7 @@ class Operations {
 
     static async getChangeset(context: CommandContext, changeSetType: ChangeSetType) {
         const actions = new Actions(context.client);
+
         try {
             const details = await actions.diff(
                 context.stackName,
@@ -493,6 +494,10 @@ class Operations {
             } else {
                 // we assume if template is not string, it's a pre-loaded template body object
                 context.newTemplate = new Template(context.template as CloudFormationTemplate);
+            }
+
+            if (context.newTemplate.body && context.newTemplate.body.Description) {
+                context.description = context.newTemplate.body.Description;
             }
 
             const lookup = new Lookup(context.client);

@@ -43,7 +43,7 @@
         "typescript-eslint": "^7.6.0",
         "eslint": "^8.34.0",
         "opener": "^1.4.1",
-        "sinon": "^15.0.0",
+        "sinon": "^18.0.0",
         "tape": "^5.4.0",
         "ts-node": "^10.9.1",
         "ts-node-test": "^0.4.1",

@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file. For change log formatting, see http://keepachangelog.com/
 
+## 7.4.0 - 2024-05-17
+- :rocket: Parse and post description field
+
 ## 7.3.0 - 2024-05-16
 - :arrow_up: Update to latest deps
 - :tada: Internal support for Cloudformation Descriptions

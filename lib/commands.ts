@@ -319,6 +319,10 @@ class Operations {
                 context.newTemplate = new Template(context.template as CloudFormationTemplate);
             }
 
+            if (context.newTemplate.body && context.newTemplate.body.Description) {
+                context.description = context.newTemplate.body.Description;
+            }
+
             const lookup = new Lookup(context.client);
             context.oldTemplate = await lookup.template(context.stackName);
             context.oldTemplate.parameters = await lookup.parameters(context.stackName);

@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file. For change log formatting, see http://keepachangelog.com/
 
+## 7.4.2 - 2024-05-17
+- :bug: Ensure UpdatePreamble also fills description
+
 ## 7.4.1 - 2024-05-17
 - :bug: Ensure Description cannot be empty
 

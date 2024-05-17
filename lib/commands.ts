@@ -1,4 +1,7 @@
 import type { CFNConfigClient } from '../index.js';
+import {
+    ChangeSetType,
+} from '@aws-sdk/client-cloudformation';
 import assert from 'assert';
 import path from 'path';
 import jsonDiff from 'json-diff';
@@ -237,6 +240,7 @@ class CommandContext {
     changeset?: ChangeSetDetail;
     changesetParameters?: Parameter[];
     diffs: any;
+    description: string;
     saveName?: string;
     configNames?: string[];
     configName?: string;
@@ -266,6 +270,8 @@ class CommandContext {
 
         this.oldTemplate = new Template();
         this.newTemplate = new Template();
+
+        this.description = '';
 
         if (!overrides) overrides = {};
         this.overrides = {
@@ -421,18 +427,19 @@ class Operations {
     }
 
     static async getChangesetCreate(context: CommandContext) {
-        await Operations.getChangeset(context, 'CREATE');
+        await Operations.getChangeset(context, ChangeSetType.CREATE);
     }
 
     static async getChangesetUpdate(context: CommandContext) {
-        await Operations.getChangeset(context, 'UPDATE');
+        await Operations.getChangeset(context, ChangeSetType.UPDATE);
     }
 
-    static async getChangeset(context: CommandContext, changeSetType: string) {
+    static async getChangeset(context: CommandContext, changeSetType: ChangeSetType) {
         const actions = new Actions(context.client);
         try {
             const details = await actions.diff(
                 context.stackName,
+                context.description,
                 changeSetType,
                 context.templateUrl,
                 context.changesetParameters,
@@ -531,7 +538,7 @@ class Operations {
         }
     }
 
-    static async confirmCreate(context: CommandContext) {
+    static async confirmCreate() {
         const ready = await Prompt.confirm('Ready to create the stack?');
         if (!ready) throw new Error('aborted');
     }

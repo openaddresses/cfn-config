@@ -1,4 +1,5 @@
-import fs from 'fs';
+import fs from 'node:fs';
+import { Readable } from 'node:stream';
 import test from 'tape';
 import Lookup from '../lib/lookup.js';
 import CloudFormation from '@aws-sdk/client-cloudformation';
@@ -653,7 +654,7 @@ test('[lookup.configuration] cannot parse object data', async(t) => {
             return Promise.resolve('us-east-');
         } else if (command instanceof S3.GetObjectCommand) {
             return Promise.resolve({
-                Body: Buffer.from('invalid')
+                Body: Readable.from(Buffer.from('invalid'))
             });
         }
     });
@@ -693,7 +694,7 @@ test('[lookup.configuration] success', async(t) => {
             }, 'requested expected configuration');
 
             return Promise.resolve({
-                Body: Buffer.from(JSON.stringify(info))
+                Body: Readable.from(Buffer.from(JSON.stringify(info)))
             });
         }
     });
@@ -767,7 +768,7 @@ test('[lookup.defaultConfiguration] cannot parse object data', async(t) => {
             return Promise.resolve('us-east-')
         } else if (command instanceof S3.GetObjectCommand) {
             return Promise.resolve({
-                Body: Buffer.from('invalid')
+                Body: Readable.from(Buffer.from('invalid'))
             });
         }
     });
@@ -807,7 +808,7 @@ test('[lookup.defaultConfiguration] success', async(t) => {
             }, 'requested expected default configuration');
 
             return Promise.resolve({
-                Body: Buffer.from(JSON.stringify(info))
+                Body: Readable.from(Buffer.from(JSON.stringify(info)))
             });
         }
     });

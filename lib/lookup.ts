@@ -286,7 +286,7 @@ export default class Lookup {
         }
 
         try {
-            return JSON.parse(data.Body.toString());
+            return JSON.parse(await streamToString(data.Body as Readable));
         } catch (err) {
             return {};
         }

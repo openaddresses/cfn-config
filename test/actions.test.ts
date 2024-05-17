@@ -1,5 +1,4 @@
 import fs from 'fs';
-import events from 'events';
 import test from 'tape';
 import Sinon from 'sinon';
 import Actions from '../lib/actions.js';
@@ -54,7 +53,7 @@ test('[actions.diff] stack does not exist', async(t) => {
     });
 
     try {
-        await actions.diff('my-stack', 'UPDATE', 'https://my-bucket.s3.amazonaws.com/my-template.json', [], []);
+        await actions.diff('my-stack', 'Stack Description', 'UPDATE', 'https://my-bucket.s3.amazonaws.com/my-template.json', [], []);
         t.fail();
     } catch (err) {
         t.ok(err instanceof Actions.CloudFormationError, 'expected error returned');
@@ -79,7 +78,7 @@ test('[actions.diff] invalid parameters', async(t) => {
     });
 
     try {
-        await actions.diff('my-stack', 'UPDATE', 'https://my-bucket.s3.amazonaws.com/my-template.json', [], []);
+        await actions.diff('my-stack', 'Stack Description', 'UPDATE', 'https://my-bucket.s3.amazonaws.com/my-template.json', [], []);
         t.fail();
     } catch (err) {
         t.ok(err instanceof Actions.CloudFormationError, 'expected error returned');
@@ -104,7 +103,7 @@ test('[actions.diff] template url does not exist', async(t) => {
     });
 
     try {
-        await actions.diff('my-stack', 'UPDATE', 'https://my-bucket.s3.amazonaws.com/my-template.json', [], []);
+        await actions.diff('my-stack', 'Stack Description', 'UPDATE', 'https://my-bucket.s3.amazonaws.com/my-template.json', [], []);
         t.fail();
     } catch (err) {
         t.ok(err instanceof Actions.CloudFormationError, 'expected error returned');
@@ -129,7 +128,7 @@ test('[actions.diff] template url is invalid', async(t) => {
     });
 
     try {
-        await actions.diff('my-stack', 'UPDATE', 'https://my-bucket.s3.amazonaws.com/my-template.json', [], []);
+        await actions.diff('my-stack', 'Stack Description', 'UPDATE', 'https://my-bucket.s3.amazonaws.com/my-template.json', [], []);
         t.fail();
     } catch (err) {
         t.ok(err instanceof Actions.CloudFormationError, 'expected error returned');
@@ -154,7 +153,7 @@ test('[actions.diff] template is invalid', async(t) => {
     });
 
     try {
-        await actions.diff('my-stack', 'UPDATE', 'https://my-bucket.s3.amazonaws.com/my-template.json', [], []);
+        await actions.diff('my-stack', 'Stack Description', 'UPDATE', 'https://my-bucket.s3.amazonaws.com/my-template.json', [], []);
         t.fail();
     } catch (err) {
         t.ok(err instanceof Actions.CloudFormationError, 'expected error returned');
@@ -181,7 +180,8 @@ test('[actions.diff] createChangeSet error on wrong changeSetType', async(t) => 
     });
 
     try {
-        await actions.diff('my-stack', 'INVALID', url, [], []);
+        // @ts-expect-error This is primarily to test in non-ts environments
+        await actions.diff('my-stack', 'Stack Description', 'INVALID', url, [], []);
         t.fail();
     } catch (err) {
         t.ok(err instanceof Actions.CloudFormationError, 'expected error returned');
@@ -207,7 +207,7 @@ test('[actions.diff] unexpected createChangeSet error', async(t) => {
 
     try {
         const url = 'https://my-bucket.s3.amazonaws.com/my-template.json';
-        await actions.diff('my-stack', 'UPDATE', url, [], []);
+        await actions.diff('my-stack', 'Stack Description', 'UPDATE', url, [], []);
         t.fail();
     } catch (err) {
         t.ok(err instanceof Actions.CloudFormationError, 'expected error returned');
@@ -240,7 +240,7 @@ test('[actions.diff] unexpected describeChangeSet error', async(t) => {
     });
 
     try {
-        await actions.diff('my-stack', 'UPDATE', url, [], []);
+        await actions.diff('my-stack', 'Stack Description', 'UPDATE', url, [], []);
         t.fail();
     } catch (err) {
         t.ok(err instanceof Actions.CloudFormationError, 'expected error returned');
@@ -279,7 +279,7 @@ test('[actions.diff] changeset failed to create', async(t) => {
     });
 
     try {
-        const data = await actions.diff('my-stack', 'UPDATE', url, [], []);
+        const data = await actions.diff('my-stack', 'Stack Description', 'UPDATE', url, [], []);
 
         t.deepEqual(data, {
             id: '123',
@@ -307,6 +307,7 @@ test('[actions.diff] success', async(t) => {
                 ChangeSetName: command.input.ChangeSetName,
                 ChangeSetType: 'UPDATE',
                 StackName: 'my-stack',
+                Description: 'Stack Description',
                 Capabilities: ['CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND'],
                 Parameters: [
                     { ParameterKey: 'Name', ParameterValue: 'Chuck' },
@@ -422,7 +423,7 @@ test('[actions.diff] success', async(t) => {
     });
 
     try {
-        const data = await actions.diff('my-stack', 'UPDATE', url, parameters, [{
+        const data = await actions.diff('my-stack', 'Stack Description', 'UPDATE', url, parameters, [{
             Key: 'developer',
             Value: 'ingalls'
         }], true);
@@ -1121,7 +1122,7 @@ test('[actions.saveTemplate] us-east-1', async(t) => {
 
 test('[actions.saveTemplate] needs whitespace removal', async(t) => {
     const url = 'https://s3.amazonaws.com/my-bucket/cirjpj94c0000s5nzc1j452o7-my-stack.template.json';
-    // @ts-ignore
+    // @ts-expect-error Untyped Code
     const template = (await import('./fixtures/huge-template.js')).default;
 
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {

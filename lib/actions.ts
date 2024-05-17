@@ -417,7 +417,7 @@ function changeSet(
         ChangeSetType,
         TemplateURL,
         Parameters,
-        Description,
+        Description: Description.trim().length ? Description : StackName,
         Tags
     };
 

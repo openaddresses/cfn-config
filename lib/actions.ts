@@ -329,15 +329,13 @@ export default class Actions {
         const key = randomUUID() + '-' + name + '.template.json';
 
         let host;
-        if (region == 'us-east-1') {
-            host = 'https://s3.amazonaws.com';
-        } else if (region.match(/^cn-/)) {
-            host = 'https://s3.' + region + '.amazonaws.com.cn';
+        if (region.match(/^cn-/)) {
+            host = 'https://' + bucket + region + 's3.amazonaws.com.cn';
         } else {
-            host = 'https://s3-' + region + '.amazonaws.com';
+            host = 'https://' + bucket + region + 's3.amazonaws.com';
         }
 
-        return [host, bucket, key].join('/');
+        return [host, key].join('/');
     }
 
 }

@@ -73,7 +73,7 @@ export default class TemplateReader {
             try {
                 await fs.stat(templatePath);
             } catch (err) {
-                throw new TemplateReader.NotFoundError(`${templatePath} does not exist`);
+                throw new TemplateReader.NotFoundError(`${templatePath} does not exist: ${err.message}`);
             }
 
             let templateBody;
@@ -125,7 +125,7 @@ export default class TemplateReader {
             try {
                 templateBody = JSON.parse(data.Body.toString());
             } catch (err) {
-                throw new TemplateReader.InvalidTemplateError(`Failed to parse ${templatePath}`);
+                throw new TemplateReader.InvalidTemplateError(`Failed to parse ${templatePath}: ${err.message}`);
             }
 
             return new Template(templateBody);

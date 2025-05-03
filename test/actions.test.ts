@@ -973,7 +973,7 @@ test('[actions.templateUrl] us-east-1', async (t) => {
         }
     });
     const url = await actions.templateUrl('my-bucket', 'my-stack');
-    const re = /https:\/\/s3.amazonaws.com\/my-bucket\/.*-my-stack.template.json/;
+    const re = /https:\/\/my-bucket.us-east-1.s3.amazonaws.com\/.*-my-stack.template.json/;
     t.ok(re.test(url), 'expected url');
 
     Sinon.restore();
@@ -997,7 +997,7 @@ test('[actions.templateUrl] cn-north-1', async (t) => {
         }
     });
     const url = await actions.templateUrl('my-bucket', 'my-stack');
-    const re = /https:\/\/s3.cn-north-1.amazonaws.com.cn\/my-bucket\/.*-my-stack.template.json/;
+    const re = /https:\/\/my-bucket.cn-north-1.s3.amazonaws.com.cn\/.*-my-stack.template.json/;
     t.ok(re.test(url), 'expected url');
 
     Sinon.restore()
@@ -1021,7 +1021,7 @@ test('[actions.templateUrl] eu-central-1', async (t) => {
     });
 
     const url = await actions.templateUrl('my-bucket', 'my-stack');
-    const re = /https:\/\/s3-eu-central-1.amazonaws.com\/my-bucket\/.*-my-stack.template.json/;
+    const re = /https:\/\/my-bucket.eu-central-1.s3.amazonaws.com\/.*-my-stack.template.json/;
     t.ok(re.test(url), 'expected url');
 
     Sinon.restore();

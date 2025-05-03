@@ -2,7 +2,7 @@ import type { CFNConfigClient } from '../index.js';
 import {
     ChangeSetType,
 } from '@aws-sdk/client-cloudformation';
-import assert from 'assert';
+import assert, { AssertionError } from 'assert';
 import path from 'path';
 import jsonDiff from 'json-diff';
 import stableStringify from 'json-stable-stringify';

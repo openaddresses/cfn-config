@@ -286,13 +286,14 @@ export default class Actions {
     /**
      * Save a CloudFormation template to S3
      *
-     * @param templateUrl - an S3 URL where the template will be saved
+     * @param templateUrl - an S3 URL where the template will be saved in the format of <bucket>.s3.<region>.amazonaws.com<?.cn>
      * @param templateBody - the CloudFormation template as a JSON string
      */
     async saveTemplate(templateUrl: string, templateBody: string) {
         const uri = url.parse(templateUrl);
-        const prefix = uri.host.replace(/^s3[-.]/, '').split('.');
-        const region = prefix.length === 2 ? 'us-east-1' : prefix[0];
+
+        const regionMatch = uri.host.match(/\.s3\.(dualstack\.)?(.*?)\.amazonaws\.com/);
+        const region = regionMatch ? regionMatch[0] : 'us-east-1';
 
         // If the template is too large, remove excess whitespace/indentation
         if (templateBody.length > 460800) {
@@ -308,6 +309,8 @@ export default class Actions {
         try {
             await s3.send(new S3.PutObjectCommand(params));
         } catch (err) {
+            console.error(err);
+
             if (err.code === 'NoSuchBucket') {
                 throw new Actions.BucketNotFoundError(`S3 bucket ${params.Bucket} not found in ${region}`);
             } else {
@@ -328,11 +331,10 @@ export default class Actions {
         const region = await lookup.bucketRegion(bucket);
         const key = randomUUID() + '-' + name + '.template.json';
 
-        let host;
+        let host = `https://${bucket}.s3.dualstack.${region}.amazonaws.com`;
+
         if (region.match(/^cn-/)) {
-            host = 'https://' + bucket + '.' + region + '.s3.amazonaws.com.cn';
-        } else {
-            host = 'https://' + bucket + '.' + region + '.s3.amazonaws.com';
+            host = host + '.cn';
         }
 
         return [host, key].join('/');

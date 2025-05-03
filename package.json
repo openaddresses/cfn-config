@@ -24,7 +24,7 @@
         "@aws-sdk/client-cloudformation": "^3.272.0",
         "@aws-sdk/client-kms": "^3.272.0",
         "@aws-sdk/client-s3": "^3.272.0",
-        "@openaddresses/s3urls": "^3.3.0",
+        "@openaddresses/s3urls": "^4.1.1",
         "colors": "1.4.0",
         "diff": "^7.0.0",
         "easy-table": "^1.0.0",

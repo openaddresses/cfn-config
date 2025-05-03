@@ -973,7 +973,7 @@ test('[actions.templateUrl] us-east-1', async (t) => {
         }
     });
     const url = await actions.templateUrl('my-bucket', 'my-stack');
-    const re = /https:\/\/s3.amazonaws.com\/my-bucket\/.*-my-stack.template.json/;
+    const re = /https:\/\/my-bucket.s3.dualstack.us-east-1.amazonaws.com\/.*-my-stack.template.json/;
     t.ok(re.test(url), 'expected url');
 
     Sinon.restore();
@@ -997,7 +997,8 @@ test('[actions.templateUrl] cn-north-1', async (t) => {
         }
     });
     const url = await actions.templateUrl('my-bucket', 'my-stack');
-    const re = /https:\/\/s3.cn-north-1.amazonaws.com.cn\/my-bucket\/.*-my-stack.template.json/;
+    const re = /https:\/\/my-bucket.s3.dualstack.cn-north-1.amazonaws.com.cn\/.*-my-stack.template.json/;
+
     t.ok(re.test(url), 'expected url');
 
     Sinon.restore()
@@ -1021,7 +1022,7 @@ test('[actions.templateUrl] eu-central-1', async (t) => {
     });
 
     const url = await actions.templateUrl('my-bucket', 'my-stack');
-    const re = /https:\/\/s3-eu-central-1.amazonaws.com\/my-bucket\/.*-my-stack.template.json/;
+    const re = /https:\/\/my-bucket.s3.dualstack.eu-central-1.amazonaws.com\/.*-my-stack.template.json/;
     t.ok(re.test(url), 'expected url');
 
     Sinon.restore();
@@ -1029,7 +1030,7 @@ test('[actions.templateUrl] eu-central-1', async (t) => {
 });
 
 test('[actions.saveTemplate] bucket does not exist', async(t) => {
-    const url = 'https://s3.amazonaws.com/my-bucket/cirjpj94c0000s5nzc1j452o7-my-stack.template.json';
+    const url = 'https://map-bucket.s3.us-east-1.amazonaws.com/cirjpj94c0000s5nzc1j452o7-my-stack.template.json';
     const template = String(fs.readFileSync(new URL('./fixtures/template.json', import.meta.url)));
 
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
@@ -1059,7 +1060,7 @@ test('[actions.saveTemplate] bucket does not exist', async(t) => {
 });
 
 test('[actions.saveTemplate] s3 error', async(t) => {
-    const url = 'https://s3.amazonaws.com/my-bucket/cirjpj94c0000s5nzc1j452o7-my-stack.template.json';
+    const url = 'https://my-bucket.s3.us-east-1.amazonaws.com/cirjpj94c0000s5nzc1j452o7-my-stack.template.json';
     const template = String(fs.readFileSync(new URL('./fixtures/template.json', import.meta.url)));
 
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
@@ -1087,7 +1088,7 @@ test('[actions.saveTemplate] s3 error', async(t) => {
 });
 
 test('[actions.saveTemplate] us-east-1', async(t) => {
-    const url = 'https://s3.amazonaws.com/my-bucket/cirjpj94c0000s5nzc1j452o7-my-stack.template.json';
+    const url = 'https://my-bucket.s3.us-east-1.amazonaws.com/cirjpj94c0000s5nzc1j452o7-my-stack.template.json';
     const template = String(fs.readFileSync(new URL('./fixtures/template.json', import.meta.url)));
 
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
@@ -1121,7 +1122,7 @@ test('[actions.saveTemplate] us-east-1', async(t) => {
 });
 
 test('[actions.saveTemplate] needs whitespace removal', async(t) => {
-    const url = 'https://s3.amazonaws.com/my-bucket/cirjpj94c0000s5nzc1j452o7-my-stack.template.json';
+    const url = 'https://my-bucket.s3.us-east-1.amazonaws.com/cirjpj94c0000s5nzc1j452o7-my-stack.template.json';
     // @ts-expect-error Untyped Code
     const template = (await import('./fixtures/huge-template.js')).default;
 
@@ -1156,7 +1157,7 @@ test('[actions.saveTemplate] needs whitespace removal', async(t) => {
 });
 
 test('[actions.saveTemplate] cn-north-1', async(t) => {
-    const url = 'https://s3-cn-north-1.amazonaws.com.cn/my-bucket/cirjpj94c0000s5nzc1j452o7-my-stack.template.json';
+    const url = 'https://my-bucket.s3.cn-north-1.amazonaws.com.cn/cirjpj94c0000s5nzc1j452o7-my-stack.template.json';
     const template = String(fs.readFileSync(new URL('./fixtures/template.json', import.meta.url)));
 
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
@@ -1190,7 +1191,7 @@ test('[actions.saveTemplate] cn-north-1', async(t) => {
 });
 
 test('[actions.saveTemplate] eu-central-1', async(t) => {
-    const url = 'https://s3-eu-central-1.amazonaws.com/my-bucket/cirjpj94c0000s5nzc1j452o7-my-stack.template.json';
+    const url = 'https://my-bucket.s3.eu-central-1.amazonaws.com/cirjpj94c0000s5nzc1j452o7-my-stack.template.json';
     const template = String(fs.readFileSync(new URL('./fixtures/template.json', import.meta.url)));
 
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {

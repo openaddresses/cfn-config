@@ -8,14 +8,14 @@
     "main": "dist/index.js",
     "types": "index.ts",
     "engines": {
-        "node": ">= 18"
+        "node": ">= 22"
     },
     "repository": {
         "url": "https://github.com/openaddresses/cfn-config.git",
         "type": "git"
     },
     "scripts": {
-        "test": "ts-node-test test/**.test.ts",
+        "test": "tsx --test test/**.test.ts",
         "lint": "eslint index.ts lib/*.ts test/*.ts",
         "build": "tsc --build",
         "pretest": "npm run lint"
@@ -24,29 +24,28 @@
         "@aws-sdk/client-cloudformation": "^3.272.0",
         "@aws-sdk/client-kms": "^3.272.0",
         "@aws-sdk/client-s3": "^3.272.0",
-        "@openaddresses/s3urls": "^3.3.0",
+        "@openaddresses/s3urls": "^4.1.1",
         "colors": "1.4.0",
-        "diff": "^5.1.0",
+        "diff": "^7.0.0",
         "easy-table": "^1.0.0",
-        "inquirer": "^9.0.0",
+        "inquirer": "^12.6.0",
         "json-diff": "^1.0.0",
         "json-stable-stringify": "^1.0.2"
     },
     "devDependencies": {
-        "@types/diff": "^5.0.2",
+        "@types/diff": "^7.0.2",
         "@types/inquirer": "^9.0.3",
         "@types/json-diff": "^1.0.0",
         "@types/json-stable-stringify": "^1.0.34",
-        "@types/node": "^20.0.0",
+        "@types/node": "^22.15.3",
         "@types/sinon": "^17.0.0",
         "@types/tape": "^5.0.0",
-        "typescript-eslint": "^7.6.0",
-        "eslint": "^8.34.0",
+        "eslint": "^9.26.0",
         "opener": "^1.4.1",
-        "sinon": "^18.0.0",
+        "sinon": "^20.0.0",
         "tape": "^5.4.0",
-        "ts-node": "^10.9.1",
-        "ts-node-test": "^0.4.1",
-        "typescript": "^5.0.0"
+        "tsx": "^4.19.4",
+        "typescript": "^5.0.0",
+        "typescript-eslint": "^8.31.1"
     }
 }

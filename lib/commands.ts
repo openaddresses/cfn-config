@@ -2,7 +2,7 @@ import type { CFNConfigClient } from '../index.js';
 import {
     ChangeSetType,
 } from '@aws-sdk/client-cloudformation';
-import assert from 'assert';
+import assert, { AssertionError } from 'assert';
 import path from 'path';
 import jsonDiff from 'json-diff';
 import stableStringify from 'json-stable-stringify';
@@ -636,7 +636,11 @@ function compareParameters(existing: Template, desired: Template) {
         assert.deepEqual(existing, desired);
         return;
     } catch (err) {
-        return jsonDiff.diffString(existing, desired);
+        if (err instanceof AssertionError) {
+            return jsonDiff.diffString(existing, desired);
+        } else {
+            throw err;
+        }
     }
 }
 
@@ -648,6 +652,8 @@ function compareTemplate(existing: Template, desired: Template) {
         assert.equal(existingstr, desiredstr);
         return;
     } catch (err) {
+        if (!(err instanceof AssertionError)) throw err;
+
         const strDiff = diffLines(existingstr, desiredstr, {
             ignoreWhitespace: true
         });

@@ -330,9 +330,9 @@ export default class Actions {
 
         let host;
         if (region.match(/^cn-/)) {
-            host = 'https://' + bucket + region + 's3.amazonaws.com.cn';
+            host = 'https://' + bucket + '.' + region + 's3.amazonaws.com.cn';
         } else {
-            host = 'https://' + bucket + region + 's3.amazonaws.com';
+            host = 'https://' + bucket + '.' + region + 's3.amazonaws.com';
         }
 
         return [host, key].join('/');

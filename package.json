@@ -15,7 +15,7 @@
         "type": "git"
     },
     "scripts": {
-        "test": "ts-node-test test/**.test.ts",
+        "test": "tsx --test test/**.test.ts",
         "lint": "eslint index.ts lib/*.ts test/*.ts",
         "build": "tsc --build",
         "pretest": "npm run lint"
@@ -40,13 +40,12 @@
         "@types/node": "^22.15.3",
         "@types/sinon": "^17.0.0",
         "@types/tape": "^5.0.0",
-        "typescript-eslint": "^8.31.1",
         "eslint": "^9.26.0",
         "opener": "^1.4.1",
         "sinon": "^20.0.0",
         "tape": "^5.4.0",
-        "ts-node": "^10.9.1",
-        "ts-node-test": "^0.4.1",
-        "typescript": "^5.0.0"
+        "tsx": "^4.19.4",
+        "typescript": "^5.0.0",
+        "typescript-eslint": "^8.31.1"
     }
 }

@@ -8,14 +8,14 @@
     "main": "dist/index.js",
     "types": "index.ts",
     "engines": {
-        "node": ">= 18"
+        "node": ">= 22"
     },
     "repository": {
         "url": "https://github.com/openaddresses/cfn-config.git",
         "type": "git"
     },
     "scripts": {
-        "test": "tsx --test test/**.test.ts",
+        "test": "tsx --test --test-name-pattern .test.ts",
         "lint": "eslint index.ts lib/*.ts test/*.ts",
         "build": "tsc --build",
         "pretest": "npm run lint"

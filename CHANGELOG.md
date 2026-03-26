@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file. For change log formatting, see http://keepachangelog.com/
 
+## 8.0.1 - 2026-03-25
+- :rocket: Release process fixes
+
 ## 8.0.0 - 2026-03-25
 - :rocket: Additional TypeScript migrations and type exports
 

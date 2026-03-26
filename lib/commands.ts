@@ -33,6 +33,11 @@ export interface CommandOverrides {
     parameters?: Map<string, string>;
 }
 
+interface CommandDiffs {
+    parameters?: string;
+    template?: string;
+}
+
 /**
  * Provides a set of commands for interacting with a CloudFormation stack
  * @class
@@ -239,7 +244,7 @@ class CommandContext {
 
     changeset?: ChangeSetDetail;
     changesetParameters?: Parameter[];
-    diffs: any;
+    diffs: CommandDiffs;
     description: string;
     saveName?: string;
     configNames?: string[];

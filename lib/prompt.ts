@@ -1,5 +1,7 @@
 import inquirer from 'inquirer';
 
+type InquirerQuestions = Parameters<typeof inquirer.prompt>[0];
+
 export default class Prompt {
     /**
      * Confirm an action with a yes/no prompt
@@ -65,7 +67,7 @@ export default class Prompt {
      *
      * @param questions - inquirer questions for a CloudFormation stack's parameters
      */
-    static async parameters(questions: any): Promise<Map<string, string>> {
+    static async parameters(questions: InquirerQuestions): Promise<Map<string, string>> {
         const answers = await inquirer.prompt(questions);
 
         const result = new Map();

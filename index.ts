@@ -2,7 +2,7 @@ import Actions from './lib/actions.js';
 import { Commands } from './lib/commands.js';
 import Lookup from './lib/lookup.js';
 import Prompt from './lib/prompt.js';
-import TemplateReader from './lib/template.js';
+import TemplateReader, { Template } from './lib/template.js';
 import type {
     CommandOptions
 } from './lib/commands.js'
@@ -11,14 +11,14 @@ import type {
     Provider,
 } from '@aws-sdk/types';
 
-export { default as Actions } from './lib/actions.js';
+export { Actions };
 export type { ChangeSetDetail, ChangeSetDetailChange } from './lib/actions.js';
-export { Commands } from './lib/commands.js';
+export { Commands };
 export type { CommandOptions, CommandOverrides } from './lib/commands.js';
-export { default as Lookup } from './lib/lookup.js';
+export { Lookup };
 export type { InfoOutput } from './lib/lookup.js';
-export { default as Prompt } from './lib/prompt.js';
-export { Template, default as TemplateReader } from './lib/template.js';
+export { Prompt };
+export { Template, TemplateReader };
 export type { CloudFormationTemplate } from './lib/template.js';
 
 export interface CFNConfigClient {

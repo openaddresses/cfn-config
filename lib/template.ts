@@ -7,17 +7,33 @@ import {
     GetBucketLocationCommand
 } from '@aws-sdk/client-s3';
 
+interface CloudFormationParameter {
+    Type: string;
+    Default?: string;
+    Description?: string;
+    AllowedPattern?: string;
+    AllowedValues?: string[];
+    NoEcho?: boolean;
+    MinLength?: number | string;
+    MaxLength?: number | string;
+    MinValue?: number | string;
+    MaxValue?: number | string;
+    [x: string]: unknown;
+}
+
+interface TemplateQuestion {
+    name: string;
+    choices?: string[];
+    default?: string;
+    message: string;
+    type: 'password' | 'list' | 'input';
+    validate: (input: string) => boolean;
+}
+
 export interface CloudFormationTemplate {
     Description?: string;
     Parameters?: {
-        [x: string]: {
-            Type: string;
-            Default?: string;
-            Description?: string;
-            AllowedPattern?: string;
-            AllowedValues: string[];
-            [x: string]: unknown;
-        };
+        [x: string]: CloudFormationParameter;
     };
     Resources?: {
         [x: string]: object;
@@ -64,7 +80,7 @@ export default class TemplateReader {
      * @param templatePath - the absolute path to a local file or an S3 url
      * @param [options] - an object to pass as the first argument to async templates
      */
-    async read(templatePath: URL, options?: any): Promise<Template> {
+    async read(templatePath: URL, options?: unknown): Promise<Template> {
         if (!(templatePath instanceof URL)) throw new Error('templatePath must be of type URL');
 
         const params = s3urls.fromUrl(String(templatePath));
@@ -137,16 +153,31 @@ export default class TemplateReader {
      *
      * @param {object} templateBody - a parsed CloudFormation template
      */
-    questions(template: Template, defaults: Map<string, string> = new Map()) {
+    questions(template: Template, defaults: Map<string, string> = new Map()): TemplateQuestion[] {
         return Object.keys(template.body.Parameters).map((name: string) => {
             const parameter = template.body.Parameters[name];
 
-            const question: any = {};
-            question.name = name;
-            question.choices = parameter.AllowedValues;
-            question.default = parameter.Default;
+            const question: TemplateQuestion = {
+                name,
+                choices: parameter.AllowedValues,
+                default: parameter.Default,
+                message: name,
+                type: 'input',
+                validate: (input: string) => {
+                    let valid = true;
+                    if ('MinLength' in parameter) valid = valid && input.length >= Number(parameter.MinLength);
+                    if ('MaxLength' in parameter) valid = valid && input.length <= Number(parameter.MaxLength);
+                    if ('MinValue' in parameter) valid = valid && Number(input) >= Number(parameter.MinValue);
+                    if ('MaxValue' in parameter) valid = valid && Number(input) <= Number(parameter.MaxValue);
+                    if (parameter.AllowedPattern) valid = valid && (new RegExp(parameter.AllowedPattern)).test(input);
+                    if (parameter.Type === 'List<Number>') valid = valid && input.split(',').every((num) => {
+                        return !isNaN(parseFloat(num));
+                    });
 
-            question.message = name;
+                    return valid;
+                }
+            };
+
             if (parameter.Description) question.message += '. ' + parameter.Description;
             question.message += ':';
 
@@ -155,20 +186,6 @@ export default class TemplateReader {
                 if (parameter.AllowedValues) return 'list';
                 return 'input';
             })();
-
-            question.validate = (input: string) => {
-                let valid = true;
-                if ('MinLength' in parameter) valid = valid && input.length >= Number(parameter.MinLength);
-                if ('MaxLength' in parameter) valid = valid && input.length <= Number(parameter.MaxLength);
-                if ('MinValue' in parameter) valid = valid && Number(input) >= Number(parameter.MinValue);
-                if ('MaxValue' in parameter) valid = valid && Number(input) <= Number(parameter.MaxValue);
-                if (parameter.AllowedPattern) valid = valid && (new RegExp(parameter.AllowedPattern)).test(input);
-                if (parameter.Type === 'List<Number>') valid = valid && input.split(',').every((num) => {
-                    return !isNaN(parseFloat(num));
-                });
-
-                return valid;
-            };
 
             if (defaults.has(name)) {
                 if (!question.choices || question.choices.indexOf(defaults.get(name)) !== -1) {

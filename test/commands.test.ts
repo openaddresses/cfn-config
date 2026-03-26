@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable no-useless-escape */
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import Sinon from 'sinon';

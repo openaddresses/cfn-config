@@ -578,8 +578,9 @@ test('[actions.executeChangeSet] success', async () => {
 test('[actions.delete] stack does not exist', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof DeleteStackCommand) {
-            const err: any = new Error('Stack [my-stack] does not exist');
-            err.code = 'ValidationError';
+            const err = Object.assign(new Error('Stack [my-stack] does not exist'), {
+                code: 'ValidationError'
+            });
             throw err;
             return Promise.reject(err);
         }
@@ -685,8 +686,9 @@ test('[actions.validate] unexpected validateTemplate error', async () => {
 test('[actions.validate] invalid template', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof ValidateTemplateCommand) {
-            const err: any = new Error('Unresolved resource dependencies [Name] in the Outputs block of the template');
-            err.code = 'ValidationError';
+            const err = Object.assign(new Error('Unresolved resource dependencies [Name] in the Outputs block of the template'), {
+                code: 'ValidationError'
+            });
             return Promise.reject(err);
         }
     });
@@ -751,8 +753,9 @@ test('[actions.saveConfiguration] bucket does not exist', async () => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-1')
         } else if (command instanceof S3.PutObjectCommand) {
-            const err: any = new Error('The specified bucket does not exist');
-            err.code = 'NoSuchBucket';
+            const err = Object.assign(new Error('The specified bucket does not exist'), {
+                code: 'NoSuchBucket'
+            });
             return Promise.reject(err);
         }
     });
@@ -1008,8 +1011,9 @@ test('[actions.saveTemplate] bucket does not exist', async () => {
 
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.PutObjectCommand) {
-            const err: any = new Error('The specified bucket does not exist');
-            err.code = 'NoSuchBucket';
+            const err = Object.assign(new Error('The specified bucket does not exist'), {
+                code: 'NoSuchBucket'
+            });
             return Promise.reject(err);
         }
     });

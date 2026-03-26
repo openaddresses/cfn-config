@@ -5,6 +5,9 @@ import fs from 'fs';
 import Sinon from 'sinon';
 import S3 from '@aws-sdk/client-s3';
 
+type ErrorWithCode = Error & {
+    code: string;
+};
 
 const expected = JSON.parse(String(fs.readFileSync(new URL('./fixtures/template.json', import.meta.url))));
 
@@ -70,7 +73,7 @@ test('[template.read] S3 bucket does not exist', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         assert.ok(command instanceof S3.GetBucketLocationCommand);
         assert.deepEqual(command.input, { Bucket: 'my' }, 'requested bucket location');
-        const err: any = new Error('Bucket does not exist');
+        const err: ErrorWithCode = new Error('Bucket does not exist') as ErrorWithCode;
         err.code = 'NotFoundError';
         throw err;
     });
@@ -93,7 +96,7 @@ test('[template.read] S3 file does not exist', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetObjectCommand) {
             assert.deepEqual(command.input, { Bucket: 'my', Key: 'template' }, 'requested correct S3 object');
-            const err: any = new Error('Object does not exist');
+            const err: ErrorWithCode = new Error('Object does not exist') as ErrorWithCode;
             err.code = 'NotFoundError';
             throw err;
         } else if (command instanceof S3.GetBucketLocationCommand) {

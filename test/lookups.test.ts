@@ -7,6 +7,8 @@ import CloudFormation from '@aws-sdk/client-cloudformation';
 import S3 from '@aws-sdk/client-s3';
 import Sinon from 'sinon';
 
+type CodedError = Error & { code?: string };
+type ParameterValue = string | number;
 
 const template = JSON.parse(String(fs.readFileSync(new URL('./fixtures/template.json', import.meta.url))));
 
@@ -36,7 +38,7 @@ test('[lookup.info] describeStacks error', async () => {
 test('[lookup.info] stack does not exist', async () => {
     Sinon.stub(CloudFormation.CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof CloudFormation.DescribeStacksCommand) {
-            const err: any = new Error('Stack with id my-stack does not exist');
+            const err: CodedError = new Error('Stack with id my-stack does not exist');
             err.code = 'ValidationError';
             return Promise.reject(err);
         }
@@ -118,7 +120,7 @@ test('[lookup.info] success', async () => {
         StackId: 'stack-id',
         StackName: 'my-stack',
         Description: 'test-stack',
-        Parameters: new Map<string, any>([
+        Parameters: new Map<string, ParameterValue>([
             ['Name', 'Chuck'],
             ['Age', 18],
             ['Handedness', 'left'],
@@ -274,7 +276,7 @@ test('[lookup.parameters] success', async () => {
         }]
     };
 
-    const expected = new Map<string, any>([
+    const expected = new Map<string, ParameterValue>([
         ['Name', 'Chuck'],
         ['Age', 18],
         ['Handedness', 'left'],
@@ -327,7 +329,7 @@ test('[lookup.template] getTemplate error', async () => {
 test('[lookup.template] stack does not exist', async () => {
     Sinon.stub(CloudFormation.CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof CloudFormation.GetTemplateCommand) {
-            const err: any = new Error('Stack with id my-stack does not exist');
+            const err: CodedError = new Error('Stack with id my-stack does not exist');
             err.code = 'ValidationError';
             return Promise.reject(err);
         }
@@ -402,7 +404,7 @@ test('[lookup.configurations] bucket does not exist', async () => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-1')
         } else if (command instanceof S3.ListObjectsCommand) {
-            const err: any = new Error('The specified bucket does not exist');
+            const err: CodedError = new Error('The specified bucket does not exist');
             err.code = 'NoSuchBucket';
             return Promise.reject(err);
         }
@@ -557,7 +559,7 @@ test('[lookup.configuration] bucket does not exist', async () => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-');
         } else if (command instanceof S3.GetObjectCommand) {
-            const err: any = new Error('The specified bucket does not exist');
+            const err: CodedError = new Error('The specified bucket does not exist');
             err.code = 'NoSuchBucket';
             return Promise.reject(err);
         }
@@ -583,7 +585,7 @@ test('[lookup.configuration] S3 error', async () => {
             return Promise.resolve('us-east-');
         } else if (command instanceof S3.GetObjectCommand) {
             assert.equal(command.input.Key, 'my-stack/my-stack-staging-us-east-1.cfn.json', 'getObject called with proper key');
-            const err: any = new Error('The specified bucket does not exist');
+            const err: CodedError = new Error('The specified bucket does not exist');
             err.code = 'NoSuchBucket';
             return Promise.reject(err);
         }
@@ -609,7 +611,7 @@ test('[lookup.configuration] requested configuration does not exist', async () =
             return Promise.resolve('us-east-');
         } else if (command instanceof S3.GetObjectCommand) {
             assert.equal(command.input.Key, 'my-stack/my-stack-staging-us-east-1.cfn.json', 'getObject called with proper key');
-            const err: any = new Error('The specified key does not exist');
+            const err: CodedError = new Error('The specified key does not exist');
             err.code = 'NoSuchKey';
             return Promise.reject(err);
         }
@@ -719,7 +721,7 @@ test('[lookup.defaultConfiguration] requested configuration does not exist', asy
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-')
         } else if (command instanceof S3.GetObjectCommand) {
-            const err: any = new Error('The specified key does not exist.');
+            const err: CodedError = new Error('The specified key does not exist.');
             err.code = 'NoSuchKey';
             return Promise.reject(err);
         }
@@ -806,7 +808,7 @@ test('[lookup.defaultConfiguration] success', async () => {
 test('[lookup.bucketRegion] no bucket', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
-            const err: any = new Error('failure');
+            const err: CodedError = new Error('failure');
             err.code = 'NoSuchBucket';
             return Promise.reject(err);
         }
@@ -850,7 +852,7 @@ test('[lookup.bucketRegion] failure', async () => {
 test('[lookup.bucketRegion] no bucket', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
-            const err: any = new Error('failure');
+            const err: CodedError = new Error('failure');
             err.code = 'NoSuchBucket';
             return Promise.reject(err);
         }

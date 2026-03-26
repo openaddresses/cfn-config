@@ -162,7 +162,7 @@ export default class Lookup {
         try {
             // If this fails the above API probably returned YAML, ask for the processed result
             return new Template(JSON.parse(data.TemplateBody));
-        } catch (err) {
+        } catch {
             try {
                 data = await cfn.send(new GetTemplateCommand({
                     StackName,
@@ -269,7 +269,7 @@ export default class Lookup {
         let region;
         try {
             region = await this.bucketRegion(params.Bucket);
-        } catch (err) {
+        } catch {
             return {};
         }
 
@@ -281,13 +281,13 @@ export default class Lookup {
         let data;
         try {
             data = await s3.send(new S3.GetObjectCommand(params));
-        } catch (err) {
+        } catch {
             return {};
         }
 
         try {
             return JSON.parse(await streamToString(data.Body as Readable));
-        } catch (err) {
+        } catch {
             return {};
         }
     }

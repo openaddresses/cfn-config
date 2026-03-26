@@ -1,6 +1,5 @@
-/* eslint-disable no-console */
-/* eslint-disable no-useless-escape */
-import test from 'tape';
+import assert from 'node:assert/strict';
+import test from 'node:test';
 import Sinon from 'sinon';
 import {
     Commands,
@@ -18,7 +17,8 @@ const opts = {
     }]
 };
 
-test('[commands.create] no overrides', async(t) => {
+
+test('[commands.create] no overrides', async () => {
     const cmd = new Commands({
         region: 'us-east-1',
         credentials: { accessKeyId: '-', secretAccessKey: '-' }
@@ -27,19 +27,18 @@ test('[commands.create] no overrides', async(t) => {
     try {
         const context = await cmd.create('testing', 'templatePath');
 
-        t.equal(context.operations.length, 11, '11 operations are run');
-        t.deepEqual(context.config, opts, 'instantiate context with expected config');
-        t.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
-        t.equal(context.template, 'templatePath', 'set context.template');
-        t.deepEqual(context.tags, [{ Key: 'developer', Value: 'ingalls' }], 'set context.tags');
+        assert.equal(context.operations.length, 11, '11 operations are run');
+        assert.deepEqual(context.config, opts, 'instantiate context with expected config');
+        assert.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
+        assert.equal(context.template, 'templatePath', 'set context.template');
+        assert.deepEqual(context.tags, [{ Key: 'developer', Value: 'ingalls' }], 'set context.tags');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[commands.create] with overrides', async(t) => {
+test('[commands.create] with overrides', async () => {
     const cmd = new Commands({
         region: 'us-east-1',
         credentials: { accessKeyId: '-', secretAccessKey: '-' }
@@ -48,20 +47,19 @@ test('[commands.create] with overrides', async(t) => {
     try {
         const context = await cmd.create('testing', 'templatePath', { parameters: new Map() });
 
-        t.equal(context.operations.length, 11, '11 operations are run');
-        t.deepEqual(context.config, opts, 'instantiate context with expected config');
-        t.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
-        t.equal(context.template, 'templatePath', 'set context.template');
-        t.deepEqual(context.overrides, { parameters: new Map() }, 'sets context.overrides');
-        t.deepEqual(context.tags, [{ Key: 'developer', Value: 'ingalls' }], 'set context.tags');
+        assert.equal(context.operations.length, 11, '11 operations are run');
+        assert.deepEqual(context.config, opts, 'instantiate context with expected config');
+        assert.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
+        assert.equal(context.template, 'templatePath', 'set context.template');
+        assert.deepEqual(context.overrides, { parameters: new Map() }, 'sets context.overrides');
+        assert.deepEqual(context.tags, [{ Key: 'developer', Value: 'ingalls' }], 'set context.tags');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[commands.create] with template object', async(t) => {
+test('[commands.create] with template object', async () => {
     const cmd = new Commands({
         region: 'us-east-1',
         credentials: { accessKeyId: '-', secretAccessKey: '-' }
@@ -70,19 +68,18 @@ test('[commands.create] with template object', async(t) => {
     try {
         const context = await cmd.create('testing', { arbitrary: 'template' });
 
-        t.equal(context.operations.length, 11, '11 operations are run');
-        t.deepEqual(context.config, opts, 'instantiate context with expected config');
-        t.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
-        t.deepEqual(context.template, { arbitrary: 'template' }, 'set context.template');
-        t.deepEqual(context.tags, [{ Key: 'developer', Value: 'ingalls' }], 'set context.tags');
+        assert.equal(context.operations.length, 11, '11 operations are run');
+        assert.deepEqual(context.config, opts, 'instantiate context with expected config');
+        assert.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
+        assert.deepEqual(context.template, { arbitrary: 'template' }, 'set context.template');
+        assert.deepEqual(context.tags, [{ Key: 'developer', Value: 'ingalls' }], 'set context.tags');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[commands.update] no overrides', async(t) => {
+test('[commands.update] no overrides', async () => {
     const cmd = new Commands({
         region: 'us-east-1',
         credentials: { accessKeyId: '-', secretAccessKey: '-' }
@@ -91,20 +88,19 @@ test('[commands.update] no overrides', async(t) => {
     try {
         const context = await cmd.update('testing', 'templatePath');
 
-        t.equal(context.operations.length, 11, '11 operations are run');
-        t.deepEqual(context.config, opts, 'instantiate context with expected config');
-        t.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
-        t.equal(context.template, 'templatePath', 'set context.template');
-        t.deepEqual(context.overrides, { parameters: new Map() }, 'sets context.overrides');
-        t.deepEqual(context.tags, [{ Key: 'developer', Value: 'ingalls' }], 'set context.tags');
+        assert.equal(context.operations.length, 11, '11 operations are run');
+        assert.deepEqual(context.config, opts, 'instantiate context with expected config');
+        assert.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
+        assert.equal(context.template, 'templatePath', 'set context.template');
+        assert.deepEqual(context.overrides, { parameters: new Map() }, 'sets context.overrides');
+        assert.deepEqual(context.tags, [{ Key: 'developer', Value: 'ingalls' }], 'set context.tags');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[commands.update] with overrides', async(t) => {
+test('[commands.update] with overrides', async () => {
     const cmd = new Commands({
         region: 'us-east-1',
         credentials: { accessKeyId: '-', secretAccessKey: '-' }
@@ -113,19 +109,18 @@ test('[commands.update] with overrides', async(t) => {
     try {
         const context = await cmd.update('testing', 'templatePath', { parameters: new Map() });
 
-        t.deepEqual(context.config, opts, 'instantiate context with expected config');
-        t.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
-        t.equal(context.template, 'templatePath', 'set context.template');
-        t.deepEqual(context.overrides, { parameters: new Map() }, 'sets context.overrides');
-        t.deepEqual(context.tags, [{ Key: 'developer', Value: 'ingalls' }], 'set context.tags');
+        assert.deepEqual(context.config, opts, 'instantiate context with expected config');
+        assert.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
+        assert.equal(context.template, 'templatePath', 'set context.template');
+        assert.deepEqual(context.overrides, { parameters: new Map() }, 'sets context.overrides');
+        assert.deepEqual(context.tags, [{ Key: 'developer', Value: 'ingalls' }], 'set context.tags');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[commands.update] with template object', async(t) => {
+test('[commands.update] with template object', async () => {
     const cmd = new Commands({
         region: 'us-east-1',
         credentials: { accessKeyId: '-', secretAccessKey: '-' }
@@ -134,20 +129,19 @@ test('[commands.update] with template object', async(t) => {
     try {
         const context = await cmd.update('testing', { arbitrary: 'template' });
 
-        t.equal(context.operations.length, 11, '11 operations are run');
-        t.deepEqual(context.config, opts, 'instantiate context with expected config');
-        t.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
-        t.deepEqual(context.template, { arbitrary: 'template' }, 'set context.template');
-        t.deepEqual(context.overrides, { parameters: new Map() }, 'sets empty context.overrides');
-        t.deepEqual(context.tags, [{ Key: 'developer', Value: 'ingalls' }], 'set context.tags');
+        assert.equal(context.operations.length, 11, '11 operations are run');
+        assert.deepEqual(context.config, opts, 'instantiate context with expected config');
+        assert.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
+        assert.deepEqual(context.template, { arbitrary: 'template' }, 'set context.template');
+        assert.deepEqual(context.overrides, { parameters: new Map() }, 'sets empty context.overrides');
+        assert.deepEqual(context.tags, [{ Key: 'developer', Value: 'ingalls' }], 'set context.tags');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[commands.delete] no overrides', async(t) => {
+test('[commands.delete] no overrides', async () => {
     const cmd = new Commands({
         region: 'us-east-1',
         credentials: { accessKeyId: '-', secretAccessKey: '-' }
@@ -156,19 +150,18 @@ test('[commands.delete] no overrides', async(t) => {
     try {
         const context = await cmd.delete('testing');
 
-        t.equal(context.operations.length, 3, '3 operations are run');
-        t.deepEqual(context.config, opts, 'instantiate context with expected config');
-        t.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
-        t.deepEqual(context.overrides, { parameters: new Map() }, 'sets empty overrides');
-        t.deepEqual(context.tags, [{ Key: 'developer', Value: 'ingalls' }], 'set context.tags');
+        assert.equal(context.operations.length, 3, '3 operations are run');
+        assert.deepEqual(context.config, opts, 'instantiate context with expected config');
+        assert.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
+        assert.deepEqual(context.overrides, { parameters: new Map() }, 'sets empty overrides');
+        assert.deepEqual(context.tags, [{ Key: 'developer', Value: 'ingalls' }], 'set context.tags');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[commands.cancel] no overrides', async(t) => {
+test('[commands.cancel] no overrides', async () => {
     const cmd = new Commands({
         region: 'us-east-1',
         credentials: { accessKeyId: '-', secretAccessKey: '-' }
@@ -177,21 +170,20 @@ test('[commands.cancel] no overrides', async(t) => {
     try {
         const context = await cmd.cancel('testing');
 
-        t.equal(context.operations.length, 2, '2 operations are run');
-        t.deepEqual(context.config, opts, 'instantiate context with expected config');
-        t.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
-        t.deepEqual(context.tags, [{ Key: 'developer', Value: 'ingalls' }], 'set context.tags');
+        assert.equal(context.operations.length, 2, '2 operations are run');
+        assert.deepEqual(context.config, opts, 'instantiate context with expected config');
+        assert.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
+        assert.deepEqual(context.tags, [{ Key: 'developer', Value: 'ingalls' }], 'set context.tags');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[commands.info] success w/o resources', async(t) => {
+test('[commands.info] success w/o resources', async () => {
     Sinon.stub(Lookup.prototype, 'info').callsFake((name: string, resources: boolean) => {
-        t.equal(name, 'my-stack-testing', 'lookup.info expected stack name');
-        t.notOk(resources, 'lookup.info no resources');
+        assert.equal(name, 'my-stack-testing', 'lookup.info expected stack name');
+        assert.ok(!(resources), 'lookup.info no resources');
 
         return Promise.resolve({
             StackName: name,
@@ -213,20 +205,19 @@ test('[commands.info] success w/o resources', async(t) => {
     try {
         await cmd.info('testing');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Sinon.restore();
-    t.end();
 });
 
 /*
-test('[commands.info] success w/ resources', async(t) => {
-    sinon.stub(Lookup, 'info').callsFake((name, region, resources, decrypt) => {
-        t.equal(name, 'my-stack-testing', 'lookup.info expected stack name');
-        t.equal(region, 'us-east-1', 'lookup.info expected region');
-        t.ok(resources, 'lookup.info no resources');
-        t.notOk(decrypt, 'lookup.info decrypt=false');
+test('[commands.info] success w/ resources', async () => {
+    Sinon.stub(Lookup, 'info').callsFake((name, region, resources, decrypt) => {
+        assert.equal(name, 'my-stack-testing', 'lookup.info expected stack name');
+        assert.equal(region, 'us-east-1', 'lookup.info expected region');
+        assert.ok(resources, 'lookup.info no resources');
+        assert.ok(!(decrypt), 'lookup.info decrypt=false');
 
         return Promise.resolve();
     });
@@ -238,19 +229,18 @@ test('[commands.info] success w/ resources', async(t) => {
     try {
         await cmd.info('testing', true);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Lookup.info.restore();
-    t.end();
 });
 
-test('[commands.info] success w/o decrypt', async(t) => {
-    sinon.stub(Lookup, 'info').callsFake((name, region, resources, decrypt) => {
-        t.equal(name, 'my-stack-testing', 'lookup.info expected stack name');
-        t.equal(region, 'us-east-1', 'lookup.info expected region');
-        t.ok(resources, 'lookup.info resources');
-        t.notOk(decrypt, 'lookup.info decrypt=false');
+test('[commands.info] success w/o decrypt', async () => {
+    Sinon.stub(Lookup, 'info').callsFake((name, region, resources, decrypt) => {
+        assert.equal(name, 'my-stack-testing', 'lookup.info expected stack name');
+        assert.equal(region, 'us-east-1', 'lookup.info expected region');
+        assert.ok(resources, 'lookup.info resources');
+        assert.ok(!(decrypt), 'lookup.info decrypt=false');
 
         return Promise.resolve();
     });
@@ -262,19 +252,18 @@ test('[commands.info] success w/o decrypt', async(t) => {
     try {
         await cmd.info('testing', true);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Lookup.info.restore();
-    t.end();
 });
 
-test('[commands.info] success w/ decrypt', async(t) => {
-    sinon.stub(Lookup, 'info').callsFake((name, region, resources, decrypt) => {
-        t.equal(name, 'my-stack-testing', 'lookup.info expected stack name');
-        t.equal(region, 'us-east-1', 'lookup.info expected region');
-        t.ok(resources, 'lookup.info resources');
-        t.ok(decrypt, 'lookup.info decrypt=true');
+test('[commands.info] success w/ decrypt', async () => {
+    Sinon.stub(Lookup, 'info').callsFake((name, region, resources, decrypt) => {
+        assert.equal(name, 'my-stack-testing', 'lookup.info expected stack name');
+        assert.equal(region, 'us-east-1', 'lookup.info expected region');
+        assert.ok(resources, 'lookup.info resources');
+        assert.ok(decrypt, 'lookup.info decrypt=true');
 
         return Promise.resolve();
     });
@@ -286,16 +275,15 @@ test('[commands.info] success w/ decrypt', async(t) => {
     try {
         await cmd.info('testing', true, true);
     } catch (err) {
-        t.ifError(err, 'success');
+        assert.ifError(err, 'success');
     }
 
     Lookup.info.restore();
-    t.end();
 });
 
-test('[commands.info] null provided as suffix', async(t) => {
-    sinon.stub(Lookup, 'info').callsFake((name) => {
-        t.equal(name, 'my-stack', 'no trailing - on stack name');
+test('[commands.info] null provided as suffix', async () => {
+    Sinon.stub(Lookup, 'info').callsFake((name) => {
+        assert.equal(name, 'my-stack', 'no trailing - on stack name');
         return Promise.resolve();
     });
 
@@ -304,73 +292,68 @@ test('[commands.info] null provided as suffix', async(t) => {
     try {
         await cmd.info(null, true);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Lookup.info.restore();
-    t.end();
 });
 
-test('[commands.save] kms-mode', async(t) => {
+test('[commands.save] kms-mode', async () => {
     const cmd = new Commands(opts, true);
 
     try {
         const context = await cmd.save('testing', true);
 
-        t.deepEqual(context.config, opts, 'instantiate context with expected config');
-        t.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
-        t.equal(context.kms, true, 'sets context.kms');
+        assert.deepEqual(context.config, opts, 'instantiate context with expected config');
+        assert.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
+        assert.equal(context.kms, true, 'sets context.kms');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[commands.save] not kms-mode', async(t) => {
+test('[commands.save] not kms-mode', async () => {
     const cmd = new Commands(opts, true);
 
     try {
         const context = await cmd.save('testing');
 
-        t.deepEqual(context.config, opts, 'instantiate context with expected config');
-        t.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
-        t.equal(context.kms, false, 'sets context.kms');
+        assert.deepEqual(context.config, opts, 'instantiate context with expected config');
+        assert.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
+        assert.equal(context.kms, false, 'sets context.kms');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[commands.commandContext] sets context', (t) => {
+test('[commands.commandContext] sets context', () => {
     const context = new CommandContext(opts, 'testing', opts);
-    t.equal(context.baseName, opts.name, 'sets baseName');
-    t.equal(context.suffix, 'testing', 'sets suffix');
-    t.equal(context.stackName, opts.name + '-testing', 'sets stackName');
-    t.equal(context.stackRegion, opts.region, 'sets stackRegion');
-    t.equal(context.configBucket, opts.configBucket, 'sets configBucket');
-    t.equal(context.templateBucket, opts.templateBucket, 'sets templateBucket');
-    t.deepEqual(context.overrides, {}, 'sets empty overrides');
-    t.deepEqual(context.oldParameters, {}, 'sets empty oldParameters');
-    t.end();
+    assert.equal(context.baseName, opts.name, 'sets baseName');
+    assert.equal(context.suffix, 'testing', 'sets suffix');
+    assert.equal(context.stackName, opts.name + '-testing', 'sets stackName');
+    assert.equal(context.stackRegion, opts.region, 'sets stackRegion');
+    assert.equal(context.configBucket, opts.configBucket, 'sets configBucket');
+    assert.equal(context.templateBucket, opts.templateBucket, 'sets templateBucket');
+    assert.deepEqual(context.overrides, {}, 'sets empty overrides');
+    assert.deepEqual(context.oldParameters, {}, 'sets empty oldParameters');
 });
 
-test('[commands.commandContext] handles null suffix', (t) => {
+test('[commands.commandContext] handles null suffix', () => {
     const context = new CommandContext(opts, null, opts);
-    t.equal(context.stackName, opts.name, 'sets stackName without trailing -');
-    t.end();
+    assert.equal(context.stackName, opts.name, 'sets stackName without trailing -');
 });
 
-test('[commands.commandContext] iterates through operations', async(t) => {
+test('[commands.commandContext] iterates through operations', async () => {
     let i = 0;
     const ops = [
         async() => {
-            t.equal(i, 0, 'called first function');
+            assert.equal(i, 0, 'called first function');
             i++;
         },
         async() => {
-            t.equal(i, 1, 'called second function');
+            assert.equal(i, 1, 'called second function');
             i++;
         }
     ];
@@ -378,16 +361,15 @@ test('[commands.commandContext] iterates through operations', async(t) => {
     const context = new CommandContext(opts, 'testing', ops);
     try {
         await context.run();
-        t.equals(i, 2);
+        assert.equal(i, 2);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[commands.commandContext] context.diffs', async(t) => {
-    sinon.stub(Prompt, 'confirm').callsFake(() => {
+test('[commands.commandContext] context.diffs', async () => {
+    Sinon.stub(Prompt, 'confirm').callsFake(() => {
         return Promise.resolve(true);
     });
 
@@ -406,21 +388,20 @@ test('[commands.commandContext] context.diffs', async(t) => {
 
         const performed = await context.run();
 
-        t.equals(performed, true);
+        assert.equal(performed, true);
 
-        t.deepEqual(context.diffs, {
+        assert.deepEqual(context.diffs, {
             parameters: ' {\n\u001b[32m+  newones: "too"\u001b[39m\n }\n',
             template: '\x1B[90m {\n\x1B[39m\x1B[31m-"old": "template"\n\x1B[39m\x1B[32m+"new": "template"\n\x1B[39m\x1B[90m }\x1B[39m'
         }, 'callback provides diffs as 3rd arg');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Prompt.confirm.restore();
-    t.end();
 });
 
-test('[commands.commandContext] aborts', async(t) => {
+test('[commands.commandContext] aborts', async () => {
 
     try {
         const ops = [
@@ -431,15 +412,14 @@ test('[commands.commandContext] aborts', async(t) => {
 
         const performed = await context.run();
 
-        t.equal(performed, false, 'the requested command was not performed');
+        assert.equal(performed, false, 'the requested command was not performed');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[commands.commandContext] aborts with error', async(t) => {
+test('[commands.commandContext] aborts with error', async () => {
     try {
         const ops = [
             () => { throw new Error('failure'); }
@@ -448,20 +428,19 @@ test('[commands.commandContext] aborts with error', async(t) => {
         const context = new CommandContext(opts, 'testing', ops);
 
         await context.run();
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.equals(err.message, 'failure');
+        assert.equal(err.message, 'failure');
     }
 
-    t.end();
 });
 
-test('[Operations.updatePreamble] no template', async(t) => {
-    sinon.stub(Lookup, 'parameters').callsFake(() => {
+test('[Operations.updatePreamble] no template', async () => {
+    Sinon.stub(Lookup, 'parameters').callsFake(() => {
         return Promise.resolve();
     });
 
-    sinon.stub(Lookup, 'template').callsFake(() => {
+    Sinon.stub(Lookup, 'template').callsFake(() => {
         return Promise.resolve();
     });
 
@@ -470,23 +449,22 @@ test('[Operations.updatePreamble] no template', async(t) => {
 
         await Operations.updatePreamble(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Template.NotFoundError, 'expected error type');
-        t.equal(err.message, 'Could not load template: No template passed', 'expected error message');
+        assert.ok(err instanceof Template.NotFoundError, 'expected error type');
+        assert.equal(err.message, 'Could not load template: No template passed', 'expected error message');
     }
 
     Lookup.parameters.restore();
     Lookup.template.restore();
-    t.end();
 });
 
-test('[Operations.updatePreamble] templatePath not found', async(t) => {
-    sinon.stub(Lookup, 'parameters').callsFake(() => {
+test('[Operations.updatePreamble] templatePath not found', async () => {
+    Sinon.stub(Lookup, 'parameters').callsFake(() => {
         return Promise.resolve();
     });
 
-    sinon.stub(Lookup, 'template').callsFake(() => {
+    Sinon.stub(Lookup, 'template').callsFake(() => {
         return Promise.resolve();
     });
 
@@ -496,28 +474,27 @@ test('[Operations.updatePreamble] templatePath not found', async(t) => {
 
         await Operations.updatePreamble(context);
 
-        t.fail();
+        assert.fail();
 
     } catch (err) {
-        t.ok(err instanceof Template.NotFoundError, 'expected error type');
-        t.equal(err.message, 'Could not load template: file:///tmp/invalid/path/nonono.template.json does not exist', 'expected error message');
+        assert.ok(err instanceof Template.NotFoundError, 'expected error type');
+        assert.equal(err.message, 'Could not load template: file:///tmp/invalid/path/nonono.template.json does not exist', 'expected error message');
     }
 
     Lookup.parameters.restore();
     Lookup.template.restore();
-    t.end();
 });
 
-test('[Operations.updatePreamble] template invalid', async(t) => {
-    sinon.stub(Template, 'read').callsFake(() => {
+test('[Operations.updatePreamble] template invalid', async () => {
+    Sinon.stub(Template, 'read').callsFake(() => {
         throw new Template.InvalidTemplateError('failure');
     });
 
-    sinon.stub(Lookup, 'parameters').callsFake(() => {
+    Sinon.stub(Lookup, 'parameters').callsFake(() => {
         return Promise.resolve();
     });
 
-    sinon.stub(Lookup, 'template').callsFake(() => {
+    Sinon.stub(Lookup, 'template').callsFake(() => {
         return Promise.resolve();
     });
 
@@ -526,28 +503,27 @@ test('[Operations.updatePreamble] template invalid', async(t) => {
         context.template = 'example.template.json',
         await Operations.updatePreamble(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Template.InvalidTemplateError, 'expected error type');
-        t.equal(err.message, 'Could not parse template: failure', 'expected error message');
+        assert.ok(err instanceof Template.InvalidTemplateError, 'expected error type');
+        assert.equal(err.message, 'Could not parse template: failure', 'expected error message');
     }
 
     Template.read.restore();
     Lookup.parameters.restore();
     Lookup.template.restore();
-    t.end();
 });
 
-test('[Operations.updatePreamble] stack not found for parameters', async(t) => {
-    sinon.stub(Template, 'read').callsFake(() => {
+test('[Operations.updatePreamble] stack not found for parameters', async () => {
+    Sinon.stub(Template, 'read').callsFake(() => {
         return Promise.resolve();
     });
 
-    sinon.stub(Lookup, 'parameters').callsFake(() => {
+    Sinon.stub(Lookup, 'parameters').callsFake(() => {
         throw new Lookup.StackNotFoundError('failure');
     });
 
-    sinon.stub(Lookup, 'template').callsFake(() => {
+    Sinon.stub(Lookup, 'template').callsFake(() => {
         return Promise.resolve();
     });
 
@@ -557,28 +533,27 @@ test('[Operations.updatePreamble] stack not found for parameters', async(t) => {
 
         await Operations.updatePreamble(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.StackNotFoundError, 'expected error type');
-        t.equal(err.message, 'Missing stack: failure', 'expected error message');
+        assert.ok(err instanceof Lookup.StackNotFoundError, 'expected error type');
+        assert.equal(err.message, 'Missing stack: failure', 'expected error message');
     }
 
     Template.read.restore();
     Lookup.parameters.restore();
     Lookup.template.restore();
-    t.end();
 });
 
-test('[Operations.updatePreamble] failure getting stack parameters', async(t) => {
-    sinon.stub(Template, 'read').callsFake(() => {
+test('[Operations.updatePreamble] failure getting stack parameters', async () => {
+    Sinon.stub(Template, 'read').callsFake(() => {
         return Promise.resolve();
     });
 
-    sinon.stub(Lookup, 'parameters').callsFake(() => {
+    Sinon.stub(Lookup, 'parameters').callsFake(() => {
         throw new Lookup.CloudFormationError('failure');
     });
 
-    sinon.stub(Lookup, 'template').callsFake(() => {
+    Sinon.stub(Lookup, 'template').callsFake(() => {
         return Promise.resolve();
     });
 
@@ -588,29 +563,28 @@ test('[Operations.updatePreamble] failure getting stack parameters', async(t) =>
 
         await Operations.updatePreamble(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.CloudFormationError, 'expected error type');
-        t.equal(err.message, 'Failed to find existing stack: failure', 'expected error message');
+        assert.ok(err instanceof Lookup.CloudFormationError, 'expected error type');
+        assert.equal(err.message, 'Failed to find existing stack: failure', 'expected error message');
     }
 
     Template.read.restore();
     Lookup.parameters.restore();
     Lookup.template.restore();
-    t.end();
 
 });
 
-test('[Operations.updatePreamble] stack not found for template', async(t) => {
-    sinon.stub(Template, 'read').callsFake(() => {
+test('[Operations.updatePreamble] stack not found for template', async () => {
+    Sinon.stub(Template, 'read').callsFake(() => {
         return Promise.resolve();
     });
 
-    sinon.stub(Lookup, 'parameters').callsFake(() => {
+    Sinon.stub(Lookup, 'parameters').callsFake(() => {
         return Promise.resolve();
     });
 
-    sinon.stub(Lookup, 'template').callsFake(() => {
+    Sinon.stub(Lookup, 'template').callsFake(() => {
         throw new Lookup.StackNotFoundError('failure');
     });
 
@@ -620,28 +594,27 @@ test('[Operations.updatePreamble] stack not found for template', async(t) => {
 
         await Operations.updatePreamble(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.StackNotFoundError, 'expected error type');
-        t.equal(err.message, 'Missing stack: failure', 'expected error message');
+        assert.ok(err instanceof Lookup.StackNotFoundError, 'expected error type');
+        assert.equal(err.message, 'Missing stack: failure', 'expected error message');
     }
 
     Template.read.restore();
     Lookup.parameters.restore();
     Lookup.template.restore();
-    t.end();
 });
 
-test('[Operations.updatePreamble] failure getting stack template', async(t) => {
-    sinon.stub(Template, 'read').callsFake(() => {
+test('[Operations.updatePreamble] failure getting stack template', async () => {
+    Sinon.stub(Template, 'read').callsFake(() => {
         return Promise.resolve();
     });
 
-    sinon.stub(Lookup, 'parameters').callsFake(() => {
+    Sinon.stub(Lookup, 'parameters').callsFake(() => {
         return Promise.resolve();
     });
 
-    sinon.stub(Lookup, 'template').callsFake(() => {
+    Sinon.stub(Lookup, 'template').callsFake(() => {
         throw new Lookup.CloudFormationError('failure');
     });
 
@@ -651,30 +624,29 @@ test('[Operations.updatePreamble] failure getting stack template', async(t) => {
 
         await Operations.updatePreamble(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.CloudFormationError, 'expected error type');
-        t.equal(err.message, 'Failed to find existing stack: failure', 'expected error message');
+        assert.ok(err instanceof Lookup.CloudFormationError, 'expected error type');
+        assert.equal(err.message, 'Failed to find existing stack: failure', 'expected error message');
     }
 
     Template.read.restore();
     Lookup.parameters.restore();
     Lookup.template.restore();
-    t.end();
 });
 
-test('[Operations.updatePreamble] success', async(t) => {
-    sinon.stub(Template, 'read').callsFake((template, options) => {
-        t.equal(template.pathname, path.resolve('example.template.json'), 'read correct template path');
-        t.deepEqual(options, { template: 'options' }, 'passed overrides.templateOptions');
+test('[Operations.updatePreamble] success', async () => {
+    Sinon.stub(Template, 'read').callsFake((template, options) => {
+        assert.equal(template.pathname, path.resolve('example.template.json'), 'read correct template path');
+        assert.deepEqual(options, { template: 'options' }, 'passed overrides.templateOptions');
         return Promise.resolve({ new: 'template' });
     });
 
-    sinon.stub(Lookup, 'parameters').callsFake(() => {
+    Sinon.stub(Lookup, 'parameters').callsFake(() => {
         return Promise.resolve({ old: 'parameters' });
     });
 
-    sinon.stub(Lookup, 'template').callsFake(() => {
+    Sinon.stub(Lookup, 'template').callsFake(() => {
         return Promise.resolve({ old: 'template' });
     });
 
@@ -685,25 +657,24 @@ test('[Operations.updatePreamble] success', async(t) => {
 
         await Operations.updatePreamble(context);
 
-        t.deepEqual(context.newTemplate, { new: 'template' }, 'sets context.newTemplate');
-        t.deepEqual(context.oldTemplate, { old: 'template' }, 'sets context.oldTemplate');
-        t.deepEqual(context.oldParameters, { old: 'parameters' }, 'sets context.oldParameters');
+        assert.deepEqual(context.newTemplate, { new: 'template' }, 'sets context.newTemplate');
+        assert.deepEqual(context.oldTemplate, { old: 'template' }, 'sets context.oldTemplate');
+        assert.deepEqual(context.oldParameters, { old: 'parameters' }, 'sets context.oldParameters');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Template.read.restore();
     Lookup.parameters.restore();
     Lookup.template.restore();
-    t.end();
 });
 
-test('[Operations.updatePreamble] success with template object', async(t) => {
-    sinon.stub(Lookup, 'parameters').callsFake(() => {
+test('[Operations.updatePreamble] success with template object', async () => {
+    Sinon.stub(Lookup, 'parameters').callsFake(() => {
         return Promise.resolve({ old: 'parameters' });
     });
 
-    sinon.stub(Lookup, 'template').callsFake(() => {
+    Sinon.stub(Lookup, 'template').callsFake(() => {
         return Promise.resolve({ old: 'template' });
     });
 
@@ -713,20 +684,19 @@ test('[Operations.updatePreamble] success with template object', async(t) => {
 
         await Operations.updatePreamble(context);
 
-        t.deepEqual(context.newTemplate, { arbitrary: 'template' }, 'sets context.newTemplate');
-        t.deepEqual(context.oldTemplate, { old: 'template' }, 'sets context.oldTemplate');
-        t.deepEqual(context.oldParameters, { old: 'parameters' }, 'sets context.oldParameters');
+        assert.deepEqual(context.newTemplate, { arbitrary: 'template' }, 'sets context.newTemplate');
+        assert.deepEqual(context.oldTemplate, { old: 'template' }, 'sets context.oldTemplate');
+        assert.deepEqual(context.oldParameters, { old: 'parameters' }, 'sets context.oldParameters');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Lookup.parameters.restore();
     Lookup.template.restore();
-    t.end();
 });
 
-test('[Operations.getMasterConfig] success', async(t) => {
-    sinon.stub(Lookup, 'defaultConfiguration').callsFake(() => {
+test('[Operations.getMasterConfig] success', async () => {
+    Sinon.stub(Lookup, 'defaultConfiguration').callsFake(() => {
         return Promise.resolve({ old: 'fresh' });
     });
 
@@ -737,17 +707,16 @@ test('[Operations.getMasterConfig] success', async(t) => {
 
         await Operations.getMasterConfig(context);
 
-        t.deepEqual(context.oldParameters, { old: 'secure:staleelats' }, 'sets context.oldParameters');
+        assert.deepEqual(context.oldParameters, { old: 'secure:staleelats' }, 'sets context.oldParameters');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Lookup.defaultConfiguration.restore();
-    t.end();
 });
 
-test('[Operations.getMasterConfig] no-op', async(t) => {
-    sinon.stub(Lookup, 'defaultConfiguration').callsFake(() => {
+test('[Operations.getMasterConfig] no-op', async () => {
+    Sinon.stub(Lookup, 'defaultConfiguration').callsFake(() => {
         return Promise.resolve({ old: 'fresh' });
     });
 
@@ -758,18 +727,17 @@ test('[Operations.getMasterConfig] no-op', async(t) => {
 
         await Operations.getMasterConfig(context);
 
-        t.deepEqual(context.oldParameters, { old: 'stale' }, 'context.oldParameters stays the same');
+        assert.deepEqual(context.oldParameters, { old: 'stale' }, 'context.oldParameters stays the same');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Lookup.defaultConfiguration.restore();
-    t.end();
 
 });
 
-test('[Operations.getMasterConfig] failed', async(t) => {
-    sinon.stub(Lookup, 'defaultConfiguration').callsFake(() => {
+test('[Operations.getMasterConfig] failed', async () => {
+    Sinon.stub(Lookup, 'defaultConfiguration').callsFake(() => {
         throw new Error();
     });
 
@@ -779,17 +747,16 @@ test('[Operations.getMasterConfig] failed', async(t) => {
         context.oldParameters = { old: 'stale' };
         await Operations.getMasterConfig(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Error);
+        assert.ok(err instanceof Error);
     }
 
     Lookup.defaultConfiguration.restore();
-    t.end();
 });
 
-test('[Operations.getMasterConfig] no matching oldParameters does not put masterConfig keys into oldParameters for better looking diff at the end', async(t) => {
-    sinon.stub(Lookup, 'defaultConfiguration').callsFake(() => {
+test('[Operations.getMasterConfig] no matching oldParameters does not put masterConfig keys into oldParameters for better looking diff at the end', async () => {
+    Sinon.stub(Lookup, 'defaultConfiguration').callsFake(() => {
         return Promise.resolve({ bingo: 'fresh' });
     });
 
@@ -800,17 +767,16 @@ test('[Operations.getMasterConfig] no matching oldParameters does not put master
         context.oldParameters = { old: 'stale' };
         await Operations.getMasterConfig(context);
 
-        t.deepEqual(context.oldParameters, { old: 'stale' }, 'leaves context.oldParameters alone');
+        assert.deepEqual(context.oldParameters, { old: 'stale' }, 'leaves context.oldParameters alone');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Lookup.defaultConfiguration.restore();
-    t.end();
 });
 
-test('[Operations.getMasterConfig] adding a newParameter that matches masterConfig parameter does not get overwritten, so that user is intentional in adding newParameters', async(t) => {
-    sinon.stub(Lookup, 'defaultConfiguration').callsFake(() => {
+test('[Operations.getMasterConfig] adding a newParameter that matches masterConfig parameter does not get overwritten, so that user is intentional in adding newParameters', async () => {
+    Sinon.stub(Lookup, 'defaultConfiguration').callsFake(() => {
         return Promise.resolve({ old: 'fresh' });
     });
 
@@ -823,19 +789,18 @@ test('[Operations.getMasterConfig] adding a newParameter that matches masterConf
         context.newTemplate.Parameters = { old: 'special whale' };
         Operations.getMasterConfig(context);
 
-        t.deepEqual(context.oldParameters, { hello: 'goodbye' }, 'no matching keys between oldParameters and masterConfig, no oldParameters are replaced');
-        t.deepEqual(context.newTemplate.Parameters, { old: 'special whale' }, 'newParameters are not replaced despite matching keys');
+        assert.deepEqual(context.oldParameters, { hello: 'goodbye' }, 'no matching keys between oldParameters and masterConfig, no oldParameters are replaced');
+        assert.deepEqual(context.newTemplate.Parameters, { old: 'special whale' }, 'newParameters are not replaced despite matching keys');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Lookup.defaultConfiguration.restore();
-    t.end();
 });
 
-test('[Operations.promptParameters] force-mode', async(t) => {
-    sinon.stub(Template, 'questions').callsFake(() => {
-        t.fail('should not build questions');
+test('[Operations.promptParameters] force-mode', async () => {
+    Sinon.stub(Template, 'questions').callsFake(() => {
+        assert.fail('should not build questions');
     });
 
     try {
@@ -846,28 +811,27 @@ test('[Operations.promptParameters] force-mode', async(t) => {
 
         await Operations.promptParameters(context);
 
-        t.deepEqual(context.newParameters, { old: 'parameters' }, 'sets new parameters to old values, excluding values not present in template');
-        t.notOk(context.newParameters.new, 'does not provide a parameter value if no default for it was found');
+        assert.deepEqual(context.newParameters, { old: 'parameters' }, 'sets new parameters to old values, excluding values not present in template');
+        assert.ok(!(context.newParameters.new), 'does not provide a parameter value if no default for it was found');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Template.questions.restore();
-    t.end();
 });
 
-test('[Operations.promptParameters] not force-mode', async(t) => {
+test('[Operations.promptParameters] not force-mode', async () => {
     const questions = { parameter: 'questions' };
     const answers = { parameter: 'answers' };
 
-    sinon.stub(Template, 'questions').callsFake((template, overrides) => {
-        t.deepEqual(template, { new: 'template' }, 'builds questions for new template');
-        t.deepEqual(overrides, { defaults: { old: 'parameters' }, kmsKeyId: undefined, region: 'us-east-1' }, 'uses old parameters as default values');
+    Sinon.stub(Template, 'questions').callsFake((template, overrides) => {
+        assert.deepEqual(template, { new: 'template' }, 'builds questions for new template');
+        assert.deepEqual(overrides, { defaults: { old: 'parameters' }, kmsKeyId: undefined, region: 'us-east-1' }, 'uses old parameters as default values');
         return questions;
     });
 
-    sinon.stub(Prompt, 'parameters').callsFake((question) => {
-        t.deepEqual(question, questions, 'prompts for derived questions');
+    Sinon.stub(Prompt, 'parameters').callsFake((question) => {
+        assert.deepEqual(question, questions, 'prompts for derived questions');
         return Promise.resolve(answers);
     });
 
@@ -878,23 +842,22 @@ test('[Operations.promptParameters] not force-mode', async(t) => {
 
         await Operations.promptParameters(context);
 
-        t.deepEqual(context.newParameters, answers, 'sets new parameters to prompt responses');
+        assert.deepEqual(context.newParameters, answers, 'sets new parameters to prompt responses');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Template.questions.restore();
     Prompt.parameters.restore();
-    t.end();
 });
 
-test('[Operations.promptParameters] with parameter and kms overrides', async(t) => {
-    sinon.stub(Template, 'questions').callsFake((template, overrides) => {
-        t.deepEqual(overrides, { defaults: { old: 'overriden' }, kmsKeyId: 'this is a bomb key', region: 'us-west-2' }, 'uses override parameters');
+test('[Operations.promptParameters] with parameter and kms overrides', async () => {
+    Sinon.stub(Template, 'questions').callsFake((template, overrides) => {
+        assert.deepEqual(overrides, { defaults: { old: 'overriden' }, kmsKeyId: 'this is a bomb key', region: 'us-west-2' }, 'uses override parameters');
         return { parameter: 'questions' };
     });
 
-    sinon.stub(Prompt, 'parameters').callsFake(() => {
+    Sinon.stub(Prompt, 'parameters').callsFake(() => {
         return Promise.resolve({ the: 'answers' });
     });
 
@@ -907,15 +870,14 @@ test('[Operations.promptParameters] with parameter and kms overrides', async(t) 
 
         await Operations.promptParameters(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Template.questions.restore();
     Prompt.parameters.restore();
-    t.end();
 });
 
-test('[Operations.promptParameters] force-mode with no parameters in new template', async(t) => {
+test('[Operations.promptParameters] force-mode with no parameters in new template', async () => {
     try {
         const context = new CommandContext(opts, 'testing', []);
         context.newTemplate = { new: 'template' },
@@ -923,16 +885,15 @@ test('[Operations.promptParameters] force-mode with no parameters in new templat
 
         await Operations.promptParameters(context);
 
-        t.deepEqual(context.newParameters, {}, 'sets context.newParameters to empty');
+        assert.deepEqual(context.newParameters, {}, 'sets context.newParameters to empty');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[Operations.promptParameters] reject overrides that are not in old or new template', async(t) => {
-    sinon.stub(Prompt, 'parameters').callsFake(() => {
+test('[Operations.promptParameters] reject overrides that are not in old or new template', async () => {
+    Sinon.stub(Prompt, 'parameters').callsFake(() => {
         return Promise.resolve({ some: 'answers' });
     });
 
@@ -944,20 +905,19 @@ test('[Operations.promptParameters] reject overrides that are not in old or new 
 
         await Operations.promptParameters(context);
 
-        t.notOk(context.oldParameters.Born, 'excludes extraneous parameter override');
+        assert.ok(!(context.oldParameters.Born), 'excludes extraneous parameter override');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Prompt.parameters.restore();
-    t.end();
 });
 
-test('[Operations.promptParameters] changesetParameters use previous value for unchanged parameter values', async(t) => {
+test('[Operations.promptParameters] changesetParameters use previous value for unchanged parameter values', async () => {
     const oldParameters = { old: 'parameters', the: 'answers' };
     const newParameters = { old: 'newvalue', the: 'answers' };
 
-    sinon.stub(Prompt, 'parameters').callsFake(() => {
+    Sinon.stub(Prompt, 'parameters').callsFake(() => {
         return Promise.resolve(newParameters);
     });
 
@@ -970,20 +930,19 @@ test('[Operations.promptParameters] changesetParameters use previous value for u
 
         await Operations.promptParameters(context);
 
-        t.deepEqual(context.changesetParameters, [{ ParameterKey: 'old', ParameterValue: 'newvalue' }, { ParameterKey: 'the', UsePreviousValue: true }]);
+        assert.deepEqual(context.changesetParameters, [{ ParameterKey: 'old', ParameterValue: 'newvalue' }, { ParameterKey: 'the', UsePreviousValue: true }]);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Prompt.parameters.restore();
-    t.end();
 });
 
-test('[Operations.promptParameters] changesetParameters does not set UsePreviousValue when overrides set the value', async(t) => {
+test('[Operations.promptParameters] changesetParameters does not set UsePreviousValue when overrides set the value', async () => {
     const oldParameters = { beep: 'boop' };
     const newParameters = { beep: 'boop' };
 
-    sinon.stub(Prompt, 'parameters').callsFake(() => {
+    Sinon.stub(Prompt, 'parameters').callsFake(() => {
         return Promise.resolve(newParameters);
     });
 
@@ -996,19 +955,18 @@ test('[Operations.promptParameters] changesetParameters does not set UsePrevious
 
         await Operations.promptParameters(context);
 
-        t.deepEqual(context.changesetParameters, [{ ParameterKey: 'beep', ParameterValue: 'boop' }]);
+        assert.deepEqual(context.changesetParameters, [{ ParameterKey: 'beep', ParameterValue: 'boop' }]);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
     Prompt.parameters.restore();
-    t.end();
 });
 
-test('[Operations.promptParameters] changesetParameters sets UsePreviousValue to true in the absence of overrides', async(t) => {
+test('[Operations.promptParameters] changesetParameters sets UsePreviousValue to true in the absence of overrides', async () => {
     const oldParameters = { beep: 'bop' };
     const newParameters = { beep: 'bop' };
 
-    sinon.stub(Prompt, 'parameters').callsFake(() => {
+    Sinon.stub(Prompt, 'parameters').callsFake(() => {
         return Promise.resolve(newParameters);
     });
 
@@ -1021,20 +979,19 @@ test('[Operations.promptParameters] changesetParameters sets UsePreviousValue to
 
         await Operations.promptParameters(context);
 
-        t.deepEqual(context.changesetParameters, [{ ParameterKey: 'beep', UsePreviousValue: true }]);
+        assert.deepEqual(context.changesetParameters, [{ ParameterKey: 'beep', UsePreviousValue: true }]);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Prompt.parameters.restore();
-    t.end();
 });
 
-test('[Operations.promptParameters] do not set UsePreviousValue when creating a new stack', async(t) => {
+test('[Operations.promptParameters] do not set UsePreviousValue when creating a new stack', async () => {
     const oldParameters = { beep: 'boop' };
     const newParameters = { beep: 'boop' };
 
-    sinon.stub(Prompt, 'parameters').callsFake(() => {
+    Sinon.stub(Prompt, 'parameters').callsFake(() => {
         return Promise.resolve(newParameters);
     });
 
@@ -1048,17 +1005,16 @@ test('[Operations.promptParameters] do not set UsePreviousValue when creating a 
 
         await Operations.promptParameters(context);
 
-        t.ok(context.create, 'context.create is set to true');
-        t.deepEqual(context.changesetParameters, [{ ParameterKey: 'beep', ParameterValue: 'boop' }]);
+        assert.ok(context.create, 'context.create is set to true');
+        assert.deepEqual(context.changesetParameters, [{ ParameterKey: 'beep', ParameterValue: 'boop' }]);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Prompt.parameters.restore();
-    t.end();
 });
 
-test('[Operations.confirmParameters] force-mode', async(t) => {
+test('[Operations.confirmParameters] force-mode', async () => {
     try {
         const context = new CommandContext(opts, 'testing', []);
         context.overrides = { force: true };
@@ -1067,15 +1023,13 @@ test('[Operations.confirmParameters] force-mode', async(t) => {
 
         await Operations.confirmParameters(context);
 
-        t.pass('skipped prompting');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[Operations.confirmParameters] no difference', async(t) => {
+test('[Operations.confirmParameters] no difference', async () => {
     try {
         const context = new CommandContext(opts, 'testing', []);
         context.oldParameters = { old: 'parameters' };
@@ -1083,16 +1037,14 @@ test('[Operations.confirmParameters] no difference', async(t) => {
 
         await Operations.confirmParameters(context);
 
-        t.pass('skipped prompting');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[Operations.confirmParameters] preapproved', async(t) => {
-    sinon.stub(console, 'log');
+test('[Operations.confirmParameters] preapproved', async () => {
+    Sinon.stub(console, 'log');
 
     try {
         const context = new CommandContext(opts, 'testing', []);
@@ -1104,20 +1056,18 @@ test('[Operations.confirmParameters] preapproved', async(t) => {
 
         await Operations.confirmParameters(context);
 
-        t.ok(console.log.calledWith('Auto-confirming parameter changes... Changes were pre-approved in another region.'), 'Skip notice printed');
-        t.pass('skipped prompting');
-        t.ok(context.overrides.skipConfirmParameters, 'sets skipConfirmParameters');
+        assert.ok(console.log.calledWith('Auto-confirming parameter changes... Changes were pre-approved in another region.'), 'Skip notice printed');
+        assert.ok(context.overrides.skipConfirmParameters, 'sets skipConfirmParameters');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     console.log.restore();
-    t.end();
 });
 
-test('[Operations.confirmParameters] rejected', async(t) => {
-    sinon.stub(Prompt, 'confirm').callsFake((message) => {
-        t.equal(message, ' {\n\x1b[31m-  old: "parameters"\x1b[39m\n\x1b[32m+  new: "parameterz"\x1b[39m\n }\n\nAccept parameter changes?', 'prompted appropriate message');
+test('[Operations.confirmParameters] rejected', async () => {
+    Sinon.stub(Prompt, 'confirm').callsFake((message) => {
+        assert.equal(message, ' {\n\x1b[31m-  old: "parameters"\x1b[39m\n\x1b[32m+  new: "parameterz"\x1b[39m\n }\n\nAccept parameter changes?', 'prompted appropriate message');
         return Promise.resolve(false);
     });
 
@@ -1129,18 +1079,17 @@ test('[Operations.confirmParameters] rejected', async(t) => {
 
         await Operations.confirmParameters(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.equals(err.message, 'aborted'); // new
+        assert.equal(err.message, 'aborted'); // new
     }
 
     Prompt.confirm.restore();
-    t.end();
 });
 
-test('[Operations.confirmParameters] accepted', async(t) => {
-    sinon.stub(Prompt, 'confirm').callsFake((message) => {
-        t.equal(message, ' {\n\x1b[31m-  old: "parameters"\x1b[39m\n\x1b[32m+  new: "parameters"\x1b[39m\n }\n\nAccept parameter changes?', 'prompted appropriate message');
+test('[Operations.confirmParameters] accepted', async () => {
+    Sinon.stub(Prompt, 'confirm').callsFake((message) => {
+        assert.equal(message, ' {\n\x1b[31m-  old: "parameters"\x1b[39m\n\x1b[32m+  new: "parameters"\x1b[39m\n }\n\nAccept parameter changes?', 'prompted appropriate message');
         return Promise.resolve(true);
     });
 
@@ -1152,14 +1101,13 @@ test('[Operations.confirmParameters] accepted', async(t) => {
 
         await Operations.confirmParameters(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Prompt.confirm.restore();
-    t.end();
 });
 
-test('[Operations.confirmTemplate] no difference', async(t) => {
+test('[Operations.confirmTemplate] no difference', async () => {
     try {
         const context = new CommandContext(opts, 'testing', []);
         context.oldTemplate = { old: 'template' },
@@ -1167,15 +1115,13 @@ test('[Operations.confirmTemplate] no difference', async(t) => {
 
         await Operations.confirmTemplate(context);
 
-        t.pass('skipped prompting');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[Operations.confirmTemplate] undefined', async(t) => {
+test('[Operations.confirmTemplate] undefined', async () => {
     try {
         const context = new CommandContext(opts, 'testing', []);
         context.oldTemplate = { Parameters: { old: undefined } },
@@ -1183,15 +1129,13 @@ test('[Operations.confirmTemplate] undefined', async(t) => {
 
         await Operations.confirmTemplate(context);
 
-        t.pass('skipped prompting');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[Operations.confirmTemplate] force-mode', async(t) => {
+test('[Operations.confirmTemplate] force-mode', async () => {
     try {
         const context = new CommandContext(opts, 'testing', []);
         context.oldTemplate = { old: 'template' },
@@ -1200,14 +1144,13 @@ test('[Operations.confirmTemplate] force-mode', async(t) => {
 
         await Operations.confirmTemplate(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[Operations.confirmTemplate] preapproved', async(t) => {
-    sinon.stub(console, 'log');
+test('[Operations.confirmTemplate] preapproved', async () => {
+    Sinon.stub(console, 'log');
 
     try {
         const context = new CommandContext(opts, 'testing', []);
@@ -1221,19 +1164,18 @@ test('[Operations.confirmTemplate] preapproved', async(t) => {
 
         await Operations.confirmTemplate(context);
 
-        t.ok(console.log.calledWith('Auto-confirming template changes... Changes were pre-approved in another region.'), 'Skip notice printed');
-        t.ok(context.overrides.skipConfirmTemplate, 'sets skipConfirmTemplate');
+        assert.ok(console.log.calledWith('Auto-confirming template changes... Changes were pre-approved in another region.'), 'Skip notice printed');
+        assert.ok(context.overrides.skipConfirmTemplate, 'sets skipConfirmTemplate');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     console.log.restore();
-    t.end();
 });
 
-test('[Operations.confirmTemplate] rejected', async(t) => {
-    sinon.stub(Prompt, 'confirm').callsFake((message) => {
-        t.equal(
+test('[Operations.confirmTemplate] rejected', async () => {
+    Sinon.stub(Prompt, 'confirm').callsFake((message) => {
+        assert.equal(
             message,
             '\x1B[90m {\n\x1B[39m\x1B[31m-"old": "template"\n\x1B[39m\x1B[32m+"new": "template"\n\x1B[39m\x1B[90m }\x1B[39m\nAccept template changes?',
             'prompted appropriate message');
@@ -1248,18 +1190,17 @@ test('[Operations.confirmTemplate] rejected', async(t) => {
 
         await Operations.confirmTemplate(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.equals(err.message, 'aborted');
+        assert.equal(err.message, 'aborted');
     }
 
     Prompt.confirm.restore();
-    t.end();
 });
 
-test('[Operations.confirmTemplate] accepted', async(t) => {
-    sinon.stub(Prompt, 'confirm').callsFake((message) => {
-        t.equal(message, '\x1B[90m {\n\x1B[39m\x1B[31m-"old": "template"\n\x1B[39m\x1B[32m+"new": "template"\n\x1B[39m\x1B[90m }\x1B[39m\nAccept template changes?', 'prompted appropriate message');
+test('[Operations.confirmTemplate] accepted', async () => {
+    Sinon.stub(Prompt, 'confirm').callsFake((message) => {
+        assert.equal(message, '\x1B[90m {\n\x1B[39m\x1B[31m-"old": "template"\n\x1B[39m\x1B[32m+"new": "template"\n\x1B[39m\x1B[90m }\x1B[39m\nAccept template changes?', 'prompted appropriate message');
         return Promise.resolve(true);
     });
 
@@ -1270,16 +1211,15 @@ test('[Operations.confirmTemplate] accepted', async(t) => {
 
         await Operations.confirmTemplate(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Prompt.confirm.restore();
-    t.end();
 });
 
-test('[Operations.confirmTemplate] lengthy diff, first unchanged section ignored', async(t) => {
-    sinon.stub(Prompt, 'confirm').callsFake((message) => {
-        t.equal(message, '\x1B[90m {\n "a": "lines",\n "aa": "lines",\n\x1B[39m\x1B[31m-"and": "will change too",\n\x1B[39m\x1B[32m+"and": "has changed",\n\x1B[39m\x1B[90m "b": "lines",\n "ba": "lines",\n "c": "lines",\n\x1B[39m\x1B[90m\n---------------------------------------------\n\n\x1B[39m\x1B[90m "r": "lines",\n "s": "lines",\n "t": "lines",\n\x1B[39m\x1B[31m-"this": "will change",\n\x1B[39m\x1B[32m+"this": "has changed",\n\x1B[39m\x1B[90m "u": "lines",\n "v": "lines"\n }\x1B[39m\nAccept template changes?', 'prompted appropriate message');
+test('[Operations.confirmTemplate] lengthy diff, first unchanged section ignored', async () => {
+    Sinon.stub(Prompt, 'confirm').callsFake((message) => {
+        assert.equal(message, '\x1B[90m {\n "a": "lines",\n "aa": "lines",\n\x1B[39m\x1B[31m-"and": "will change too",\n\x1B[39m\x1B[32m+"and": "has changed",\n\x1B[39m\x1B[90m "b": "lines",\n "ba": "lines",\n "c": "lines",\n\x1B[39m\x1B[90m\n---------------------------------------------\n\n\x1B[39m\x1B[90m "r": "lines",\n "s": "lines",\n "t": "lines",\n\x1B[39m\x1B[31m-"this": "will change",\n\x1B[39m\x1B[32m+"this": "has changed",\n\x1B[39m\x1B[90m "u": "lines",\n "v": "lines"\n }\x1B[39m\nAccept template changes?', 'prompted appropriate message');
         return Promise.resolve(true);
     });
 
@@ -1364,21 +1304,20 @@ test('[Operations.confirmTemplate] lengthy diff, first unchanged section ignored
 
         await Operations.confirmTemplate(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Prompt.confirm.restore();
-    t.end();
 });
 
-test('[Operations.saveTemplate] bucket not found', async(t) => {
+test('[Operations.saveTemplate] bucket not found', async () => {
     const url = 'https://s3.amazonaws.com/my-template-bucket/my-stack-testing.template.json';
 
-    sinon.stub(Actions, 'templateUrl').callsFake(() => {
+    Sinon.stub(Actions, 'templateUrl').callsFake(() => {
         return url;
     });
 
-    sinon.stub(Actions, 'saveTemplate').callsFake(() => {
+    Sinon.stub(Actions, 'saveTemplate').callsFake(() => {
         throw new Actions.BucketNotFoundError('failure');
     });
 
@@ -1387,25 +1326,24 @@ test('[Operations.saveTemplate] bucket not found', async(t) => {
 
         await Operations.saveTemplate(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Actions.BucketNotFoundError, 'expected error type');
-        t.equal(err.message, 'Could not find template bucket: failure', 'expected error message');
+        assert.ok(err instanceof Actions.BucketNotFoundError, 'expected error type');
+        assert.equal(err.message, 'Could not find template bucket: failure', 'expected error message');
     }
 
     Actions.templateUrl.restore();
     Actions.saveTemplate.restore();
-    t.end();
 });
 
-test('[Operations.saveTemplate] failed to save template', async(t) => {
+test('[Operations.saveTemplate] failed to save template', async () => {
     const url = 'https://s3.amazonaws.com/my-template-bucket/my-stack-testing.template.json';
 
-    sinon.stub(Actions, 'templateUrl').callsFake(() => {
+    Sinon.stub(Actions, 'templateUrl').callsFake(() => {
         return url;
     });
 
-    sinon.stub(Actions, 'saveTemplate').callsFake(() => {
+    Sinon.stub(Actions, 'saveTemplate').callsFake(() => {
         throw new Actions.S3Error('failure');
     });
 
@@ -1414,32 +1352,31 @@ test('[Operations.saveTemplate] failed to save template', async(t) => {
 
         await Operations.saveTemplate(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Actions.S3Error, 'expected error type');
-        t.equal(err.message, 'Failed to save template: failure', 'expected error message');
+        assert.ok(err instanceof Actions.S3Error, 'expected error type');
+        assert.equal(err.message, 'Failed to save template: failure', 'expected error message');
     }
 
     Actions.templateUrl.restore();
     Actions.saveTemplate.restore();
-    t.end();
 });
 
-test('[Operations.saveTemplate] success', async(t) => {
+test('[Operations.saveTemplate] success', async () => {
     const templateUrl = 'https://s3.amazonaws.com/my-template-bucket/my-stack-testing.template.json';
 
     const context = new CommandContext(opts, 'testing', []);
 
-    sinon.stub(Actions, 'templateUrl').callsFake((bucket, region, suffix) => {
-        t.equal(bucket, context.templateBucket, 'template url in proper bucket');
-        t.equal(region, context.stackRegion, 'template url in proper region');
-        t.equal(suffix, context.suffix, 'template url for correct suffix');
+    Sinon.stub(Actions, 'templateUrl').callsFake((bucket, region, suffix) => {
+        assert.equal(bucket, context.templateBucket, 'template url in proper bucket');
+        assert.equal(region, context.stackRegion, 'template url in proper region');
+        assert.equal(suffix, context.suffix, 'template url for correct suffix');
         return templateUrl;
     });
 
-    sinon.stub(Actions, 'saveTemplate').callsFake((url, template) => {
-        t.equal(url, templateUrl, 'saved to correct url');
-        t.equal(template, '{\n  "new": "template"\n}', 'saved correct template');
+    Sinon.stub(Actions, 'saveTemplate').callsFake((url, template) => {
+        assert.equal(url, templateUrl, 'saved to correct url');
+        assert.equal(template, '{\n  "new": "template"\n}', 'saved correct template');
 
         return Promise.resolve();
     });
@@ -1449,18 +1386,17 @@ test('[Operations.saveTemplate] success', async(t) => {
 
         await Operations.saveTemplate(context);
 
-        t.equal(context.templateUrl, templateUrl, 'sets template url');
+        assert.equal(context.templateUrl, templateUrl, 'sets template url');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Actions.templateUrl.restore();
     Actions.saveTemplate.restore();
-    t.end();
 });
 
-test('[Operations.validateTemplate] invalid', async(t) => {
-    sinon.stub(Actions, 'validate').callsFake(() => {
+test('[Operations.validateTemplate] invalid', async () => {
+    Sinon.stub(Actions, 'validate').callsFake(() => {
         throw new Actions.CloudFormationError('failure');
     });
 
@@ -1470,22 +1406,21 @@ test('[Operations.validateTemplate] invalid', async(t) => {
 
         await Operations.validateTemplate(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Actions.CloudFormationError, 'correct error type');
-        t.equal(err.message, 'Invalid template: failure', 'expected error message');
+        assert.ok(err instanceof Actions.CloudFormationError, 'correct error type');
+        assert.equal(err.message, 'Invalid template: failure', 'expected error message');
     }
 
     Actions.validate.restore();
-    t.end();
 });
 
-test('[Operations.validateTemplate] valid', async(t) => {
+test('[Operations.validateTemplate] valid', async () => {
     const context = new CommandContext(opts, 'testing', []);
 
-    sinon.stub(Actions, 'validate').callsFake((region, url) => {
-        t.equal(region, context.stackRegion, 'validate in proper region');
-        t.equal(url, context.templateUrl, 'validate proper template');
+    Sinon.stub(Actions, 'validate').callsFake((region, url) => {
+        assert.equal(region, context.stackRegion, 'validate in proper region');
+        assert.equal(url, context.templateUrl, 'validate proper template');
         return Promise.resolve();
     });
 
@@ -1494,38 +1429,35 @@ test('[Operations.validateTemplate] valid', async(t) => {
 
         await Operations.validateTemplate(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Actions.validate.restore();
-    t.end();
 });
 
-test('[Operations.beforeUpdateHook] no hook', async(t) => {
+test('[Operations.beforeUpdateHook] no hook', async () => {
     try {
         const context = new CommandContext(opts, 'testing', []);
 
         await Operations.beforeUpdateHook(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[Operations.validateParametersHook] no hook', async(t) => {
+test('[Operations.validateParametersHook] no hook', async () => {
     try {
         const context = new CommandContext(opts, 'testing', []);
 
         await Operations.validateParametersHook(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[Operations.validateParametersHook] hook error', async(t) => {
+test('[Operations.validateParametersHook] hook error', async () => {
     try {
         const context = new CommandContext(opts, 'testing', []);
         context.overrides = {
@@ -1536,33 +1468,31 @@ test('[Operations.validateParametersHook] hook error', async(t) => {
 
         await Operations.validateParametersHook(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.equal(err.message, 'failure', 'passed through error on abort');
+        assert.equal(err.message, 'failure', 'passed through error on abort');
     }
 
-    t.end();
 });
 
-test('[Operations.validateParametersHook] hook success', async(t) => {
+test('[Operations.validateParametersHook] hook success', async () => {
     try {
         const context = new CommandContext(opts, 'testing', []);
         context.overrides = {
             validateParameters: function(arg, callback) {
-                t.deepEqual(arg, context, 'provided hook with runtime context');
+                assert.deepEqual(arg, context, 'provided hook with runtime context');
                 callback();
             }
         },
 
         await Operations.validateParametersHook(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[Operations.beforeUpdateHook] hook error', async(t) => {
+test('[Operations.beforeUpdateHook] hook error', async () => {
     try {
         const context = new CommandContext(opts, 'testing', []);
 
@@ -1574,34 +1504,32 @@ test('[Operations.beforeUpdateHook] hook error', async(t) => {
 
         await Operations.beforeUpdateHook(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.equal(err.message, 'failure', 'passed through error on abort');
+        assert.equal(err.message, 'failure', 'passed through error on abort');
     }
 
-    t.end();
 });
 
-test('[Operations.beforeUpdateHook] hook success', async(t) => {
+test('[Operations.beforeUpdateHook] hook success', async () => {
     try {
         const context = new CommandContext(opts, 'testing', []);
         context.overrides = {
             beforeUpdate: function(arg, callback) {
-                t.deepEqual(arg, context, 'provided hook with runtime context');
+                assert.deepEqual(arg, context, 'provided hook with runtime context');
                 callback();
             }
         };
 
         await Operations.beforeUpdateHook(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[Operations.getChangeset] failure', async(t) => {
-    sinon.stub(Actions, 'diff').callsFake(() => {
+test('[Operations.getChangeset] failure', async () => {
+    Sinon.stub(Actions, 'diff').callsFake(() => {
         throw new Actions.CloudFormationError('failure');
     });
 
@@ -1610,28 +1538,27 @@ test('[Operations.getChangeset] failure', async(t) => {
 
         await Operations.getChangeset(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Actions.CloudFormationError, 'correct error type');
-        t.equal(err.message, 'Failed to generate changeset: failure', 'expected error message');
+        assert.ok(err instanceof Actions.CloudFormationError, 'correct error type');
+        assert.equal(err.message, 'Failed to generate changeset: failure', 'expected error message');
     }
 
     Actions.diff.restore();
-    t.end();
 });
 
-test('[Operations.getChangeset] success', async(t) => {
+test('[Operations.getChangeset] success', async () => {
     const details = { changeset: 'details' };
 
     const context = new CommandContext(opts, 'testing', []);
 
-    sinon.stub(Actions, 'diff').callsFake((name, region, changeSetType, url, params, expand) => {
-        t.equal(name, context.stackName, 'changeset for correct stack');
-        t.equal(region, context.stackRegion, 'changeset in the correct region');
-        t.equal(changeSetType, 'UPDATE', 'changeSetType set correctly');
-        t.equal(url, context.templateUrl, 'changeset for the correct template');
-        t.deepEqual(params, context.changesetParameters, 'changeset using changeset parameters');
-        t.equal(expand, context.overrides.expand, 'changeset using override properties');
+    Sinon.stub(Actions, 'diff').callsFake((name, region, changeSetType, url, params, expand) => {
+        assert.equal(name, context.stackName, 'changeset for correct stack');
+        assert.equal(region, context.stackRegion, 'changeset in the correct region');
+        assert.equal(changeSetType, 'UPDATE', 'changeSetType set correctly');
+        assert.equal(url, context.templateUrl, 'changeset for the correct template');
+        assert.deepEqual(params, context.changesetParameters, 'changeset using changeset parameters');
+        assert.equal(expand, context.overrides.expand, 'changeset using override properties');
         return Promise.resolve(details);
     });
 
@@ -1645,18 +1572,17 @@ test('[Operations.getChangeset] success', async(t) => {
 
         await Operations.getChangeset(context, 'UPDATE');
 
-        t.deepEqual(context.changeset, details, 'sets context.changeset');
+        assert.deepEqual(context.changeset, details, 'sets context.changeset');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Actions.diff.restore();
-    t.end();
 });
 
-test('[Operations.getChangesetCreate] success', async(t) => {
-    sinon.stub(Operations, 'getChangeset').callsFake((context, changeSetType) => {
-        t.equals(changeSetType, 'CREATE', 'has changeSetType');
+test('[Operations.getChangesetCreate] success', async () => {
+    Sinon.stub(Operations, 'getChangeset').callsFake((context, changeSetType) => {
+        assert.equal(changeSetType, 'CREATE', 'has changeSetType');
         return Promise.resolve();
     });
 
@@ -1665,16 +1591,15 @@ test('[Operations.getChangesetCreate] success', async(t) => {
 
         await Operations.getChangesetCreate(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Operations.getChangeset.restore();
-    t.end();
 });
 
-test('[Operations.getChangesetUpdate] success', async(t) => {
-    sinon.stub(Operations, 'getChangeset').callsFake((context, changeSetType) => {
-        t.equals(changeSetType, 'UPDATE', 'has changeSetType');
+test('[Operations.getChangesetUpdate] success', async () => {
+    Sinon.stub(Operations, 'getChangeset').callsFake((context, changeSetType) => {
+        assert.equal(changeSetType, 'UPDATE', 'has changeSetType');
         return Promise.resolve();
     });
 
@@ -1683,42 +1608,39 @@ test('[Operations.getChangesetUpdate] success', async(t) => {
 
         await Operations.getChangesetUpdate(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Operations.getChangeset.restore();
-    t.end();
 });
 
-test('[Operations.confirmChangeset] force-mode', async(t) => {
+test('[Operations.confirmChangeset] force-mode', async () => {
     try {
         const context = new CommandContext(opts, 'testing', []);
         context.overrides = { force: true },
 
         await Operations.confirmChangeset(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[Operations.confirmChangeset] skipConfirmParams && skipConfirmTemplate', async(t) => {
+test('[Operations.confirmChangeset] skipConfirmParams && skipConfirmTemplate', async () => {
     try {
         const context = new CommandContext(opts, 'testing', []);
         context.overrides = { skipConfirmParameters: true, skipConfirmTemplate: true },
 
         await Operations.confirmChangeset(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[Operations.confirmChangeset] rejected', async(t) => {
-    sinon.stub(Prompt, 'confirm').callsFake((message, defaultValue) => {
-        t.equal(defaultValue, false);
+test('[Operations.confirmChangeset] rejected', async () => {
+    Sinon.stub(Prompt, 'confirm').callsFake((message, defaultValue) => {
+        assert.equal(defaultValue, false);
         return Promise.resolve(false);
     });
 
@@ -1728,17 +1650,16 @@ test('[Operations.confirmChangeset] rejected', async(t) => {
 
         await Operations.confirmChangeset(context);
     } catch (err) {
-        t.equals(err.message, 'aborted');
+        assert.equal(err.message, 'aborted');
     }
 
     Prompt.confirm.restore();
-    t.end();
 });
 
-test('[Operations.confirmChangeset] acccepted', async(t) => {
-    sinon.stub(Prompt, 'confirm').callsFake((message, defaultValue) => {
-        t.equal(message, '\n\n\nAccept changes and update the stack?', 'expected message');
-        t.equal(defaultValue, false);
+test('[Operations.confirmChangeset] acccepted', async () => {
+    Sinon.stub(Prompt, 'confirm').callsFake((message, defaultValue) => {
+        assert.equal(message, '\n\n\nAccept changes and update the stack?', 'expected message');
+        assert.equal(defaultValue, false);
         return Promise.resolve(true);
     });
 
@@ -1748,17 +1669,16 @@ test('[Operations.confirmChangeset] acccepted', async(t) => {
 
         await Operations.confirmChangeset(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Prompt.confirm.restore();
-    t.end();
 });
 
-test('[Operations.confirmChangeset] changeset formatting', async(t) => {
-    sinon.stub(Prompt, 'confirm').callsFake((message, defaultValue) => {
-        t.equal(message, 'Action  Name  Type  Replace\n------  ----  ----  -------\n\x1b[33mModify\x1b[39m  name  type  \x1b[31mtrue\x1b[39m   \n\x1b[32mAdd\x1b[39m     name  type  \x1b[32mfalse\x1b[39m  \n\x1b[31mRemove\x1b[39m  name  type  \x1b[32mfalse\x1b[39m  \n\nAccept changes and update the stack?', 'expected message (with colors)');
-        t.equal(defaultValue, false);
+test('[Operations.confirmChangeset] changeset formatting', async () => {
+    Sinon.stub(Prompt, 'confirm').callsFake((message, defaultValue) => {
+        assert.equal(message, 'Action  Name  Type  Replace\n------  ----  ----  -------\n\x1b[33mModify\x1b[39m  name  type  \x1b[31mtrue\x1b[39m   \n\x1b[32mAdd\x1b[39m     name  type  \x1b[32mfalse\x1b[39m  \n\x1b[31mRemove\x1b[39m  name  type  \x1b[32mfalse\x1b[39m  \n\nAccept changes and update the stack?', 'expected message (with colors)');
+        assert.equal(defaultValue, false);
         return Promise.resolve(true);
     });
 
@@ -1774,15 +1694,14 @@ test('[Operations.confirmChangeset] changeset formatting', async(t) => {
 
         await Operations.confirmChangeset(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Prompt.confirm.restore();
-    t.end();
 });
 
-test('[Operations.executeChangeSet] failure', async(t) => {
-    sinon.stub(Actions, 'executeChangeSet').callsFake(() => {
+test('[Operations.executeChangeSet] failure', async () => {
+    Sinon.stub(Actions, 'executeChangeSet').callsFake(() => {
         throw new Actions.CloudFormationError('failure');
     });
 
@@ -1792,18 +1711,17 @@ test('[Operations.executeChangeSet] failure', async(t) => {
 
         await Operations.executeChangeSet(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Actions.CloudFormationError, 'expected error type');
-        t.equal(err.message, 'Failed to execute changeset: failure');
+        assert.ok(err instanceof Actions.CloudFormationError, 'expected error type');
+        assert.equal(err.message, 'Failed to execute changeset: failure');
     }
 
     Actions.executeChangeSet.restore();
-    t.end();
 });
 
-test('[Operations.executeChangeSet] not executable', async(t) => {
-    sinon.stub(Actions, 'executeChangeSet').callsFake(() => {
+test('[Operations.executeChangeSet] not executable', async () => {
+    Sinon.stub(Actions, 'executeChangeSet').callsFake(() => {
         const err = new Actions.ChangeSetNotExecutableError('failure');
         err.execution = 'OBSOLETE';
         err.reason = 'outdated';
@@ -1816,23 +1734,22 @@ test('[Operations.executeChangeSet] not executable', async(t) => {
 
         await Operations.executeChangeSet(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Actions.ChangeSetNotExecutableError, 'expected error type');
-        t.equal(err.message, 'Status: OBSOLETE | Reason: outdated | failure', 'expected error message');
+        assert.ok(err instanceof Actions.ChangeSetNotExecutableError, 'expected error type');
+        assert.equal(err.message, 'Status: OBSOLETE | Reason: outdated | failure', 'expected error message');
     }
 
     Actions.executeChangeSet.restore();
-    t.end();
 });
 
-test('[Operations.executeChangeSet] success', async(t) => {
+test('[Operations.executeChangeSet] success', async () => {
     const context = new CommandContext(opts, 'testing', []);
 
-    sinon.stub(Actions, 'executeChangeSet').callsFake((name, region, id) => {
-        t.equal(name, context.stackName, 'execute on proper stack');
-        t.equal(region, context.stackRegion, 'execute in proper region');
-        t.equal(id, context.changeset.id, 'execute proper changeset');
+    Sinon.stub(Actions, 'executeChangeSet').callsFake((name, region, id) => {
+        assert.equal(name, context.stackName, 'execute on proper stack');
+        assert.equal(region, context.stackRegion, 'execute in proper region');
+        assert.equal(id, context.changeset.id, 'execute proper changeset');
 
         return Promise.resolve();
     });
@@ -1842,15 +1759,14 @@ test('[Operations.executeChangeSet] success', async(t) => {
 
         await Operations.executeChangeSet(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Actions.executeChangeSet.restore();
-    t.end();
 });
 
-test('[Operations.createPreamble] no template', async(t) => {
-    sinon.stub(Lookup, 'configurations').callsFake(() => {
+test('[Operations.createPreamble] no template', async () => {
+    Sinon.stub(Lookup, 'configurations').callsFake(() => {
         return Promise.resolve();
     });
 
@@ -1859,18 +1775,17 @@ test('[Operations.createPreamble] no template', async(t) => {
 
         await Operations.createPreamble(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Template.NotFoundError, 'expected error type');
-        t.equal(err.message, 'Could not load template: No template passed');
+        assert.ok(err instanceof Template.NotFoundError, 'expected error type');
+        assert.equal(err.message, 'Could not load template: No template passed');
     }
 
     Lookup.configurations.restore();
-    t.end();
 });
 
-test('[Operations.createPreamble] template not found', async(t) => {
-    sinon.stub(Lookup, 'configurations').callsFake(() => {
+test('[Operations.createPreamble] template not found', async () => {
+    Sinon.stub(Lookup, 'configurations').callsFake(() => {
         return Promise.resolve();
     });
 
@@ -1880,22 +1795,21 @@ test('[Operations.createPreamble] template not found', async(t) => {
 
         await Operations.createPreamble(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Template.NotFoundError, 'expected error type');
-        t.equal(err.message, 'Could not load template: file:///tmp/invalid/path/nonono.template.json does not exist', 'expected error message');
+        assert.ok(err instanceof Template.NotFoundError, 'expected error type');
+        assert.equal(err.message, 'Could not load template: file:///tmp/invalid/path/nonono.template.json does not exist', 'expected error message');
     }
 
     Lookup.configurations.restore();
-    t.end();
 });
 
-test('[Operations.createPreamble] template invalid', async(t) => {
-    sinon.stub(Template, 'read').callsFake(() => {
+test('[Operations.createPreamble] template invalid', async () => {
+    Sinon.stub(Template, 'read').callsFake(() => {
         throw new Template.InvalidTemplateError('failure');
     });
 
-    sinon.stub(Lookup, 'configurations').callsFake(() => {
+    Sinon.stub(Lookup, 'configurations').callsFake(() => {
         return Promise.resolve();
     });
 
@@ -1905,23 +1819,22 @@ test('[Operations.createPreamble] template invalid', async(t) => {
 
         await Operations.createPreamble(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Template.InvalidTemplateError, 'expected error type');
-        t.equal(err.message, 'Could not parse template: failure');
+        assert.ok(err instanceof Template.InvalidTemplateError, 'expected error type');
+        assert.equal(err.message, 'Could not parse template: failure');
     }
 
     Template.read.restore();
     Lookup.configurations.restore();
-    t.end();
 });
 
-test('[Operations.createPreamble] config bucket not found', async(t) => {
-    sinon.stub(Template, 'read').callsFake(() => {
+test('[Operations.createPreamble] config bucket not found', async () => {
+    Sinon.stub(Template, 'read').callsFake(() => {
         return Promise.resolve();
     });
 
-    sinon.stub(Lookup, 'configurations').callsFake(() => {
+    Sinon.stub(Lookup, 'configurations').callsFake(() => {
         throw new Lookup.BucketNotFoundError('failure');
     });
 
@@ -1931,23 +1844,22 @@ test('[Operations.createPreamble] config bucket not found', async(t) => {
 
         await Operations.createPreamble(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.BucketNotFoundError, 'expected error type');
-        t.equal(err.message, 'Could not find config bucket: failure');
+        assert.ok(err instanceof Lookup.BucketNotFoundError, 'expected error type');
+        assert.equal(err.message, 'Could not find config bucket: failure');
     }
 
     Template.read.restore();
     Lookup.configurations.restore();
-    t.end();
 });
 
-test('[Operations.createPreamble] failed to read configurations', async(t) => {
-    sinon.stub(Template, 'read').callsFake(() => {
+test('[Operations.createPreamble] failed to read configurations', async () => {
+    Sinon.stub(Template, 'read').callsFake(() => {
         return Promise.resolve();
     });
 
-    sinon.stub(Lookup, 'configurations').callsFake(() => {
+    Sinon.stub(Lookup, 'configurations').callsFake(() => {
         throw new Lookup.S3Error('failure');
     });
 
@@ -1957,29 +1869,28 @@ test('[Operations.createPreamble] failed to read configurations', async(t) => {
 
         await Operations.createPreamble(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.S3Error, 'expected error type');
-        t.equal(err.message, 'Could not load saved configurations: failure');
+        assert.ok(err instanceof Lookup.S3Error, 'expected error type');
+        assert.equal(err.message, 'Could not load saved configurations: failure');
     }
 
     Template.read.restore();
     Lookup.configurations.restore();
-    t.end();
 });
 
-test('[Operations.createPreamble] success', async(t) => {
+test('[Operations.createPreamble] success', async () => {
     const context = new CommandContext(opts, 'testing', []);
 
-    sinon.stub(Template, 'read').callsFake((template, options) => {
-        t.equal(template.pathname, path.resolve('example.template.json'), 'read correct template path');
-        t.deepEqual(options, { template: 'options' }, 'passed overrides.templateOptions');
+    Sinon.stub(Template, 'read').callsFake((template, options) => {
+        assert.equal(template.pathname, path.resolve('example.template.json'), 'read correct template path');
+        assert.deepEqual(options, { template: 'options' }, 'passed overrides.templateOptions');
         return Promise.resolve({ new: 'template' });
     });
 
-    sinon.stub(Lookup, 'configurations').callsFake((name, bucket) => {
-        t.equal(name, context.baseName, 'lookup correct stack configurations');
-        t.equal(bucket, context.configBucket, 'lookup in correct bucket');
+    Sinon.stub(Lookup, 'configurations').callsFake((name, bucket) => {
+        assert.equal(name, context.baseName, 'lookup correct stack configurations');
+        assert.equal(bucket, context.configBucket, 'lookup in correct bucket');
         return Promise.resolve(['config']);
     });
 
@@ -1989,30 +1900,29 @@ test('[Operations.createPreamble] success', async(t) => {
 
         await Operations.createPreamble(context);
 
-        t.deepEqual(context.newTemplate, { new: 'template' }, 'set context.newTemplate');
-        t.deepEqual(context.configNames, ['config'], 'set context.configNames');
-        t.ok(context.create, 'context.create is set to true');
+        assert.deepEqual(context.newTemplate, { new: 'template' }, 'set context.newTemplate');
+        assert.deepEqual(context.configNames, ['config'], 'set context.configNames');
+        assert.ok(context.create, 'context.create is set to true');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Template.read.restore();
     Lookup.configurations.restore();
-    t.end();
 });
 
-test('[Operations.createPreamble] success with template object', async(t) => {
+test('[Operations.createPreamble] success with template object', async () => {
     const context = new CommandContext(opts, 'testing', []);
 
-    sinon.stub(Template, 'read').callsFake((template, options) => {
-        t.equal(template, path.resolve(context.template), 'read correct template path');
-        t.deepEqual(options, { template: 'options' }, 'passed overrides.templateOptions');
+    Sinon.stub(Template, 'read').callsFake((template, options) => {
+        assert.equal(template, path.resolve(context.template), 'read correct template path');
+        assert.deepEqual(options, { template: 'options' }, 'passed overrides.templateOptions');
         return Promise.resolve(context.template);
     });
 
-    sinon.stub(Lookup, 'configurations').callsFake((name, bucket) => {
-        t.equal(name, context.baseName, 'lookup correct stack configurations');
-        t.equal(bucket, context.configBucket, 'lookup in correct bucket');
+    Sinon.stub(Lookup, 'configurations').callsFake((name, bucket) => {
+        assert.equal(name, context.baseName, 'lookup correct stack configurations');
+        assert.equal(bucket, context.configBucket, 'lookup in correct bucket');
         return Promise.resolve(['config']);
     });
 
@@ -2022,21 +1932,20 @@ test('[Operations.createPreamble] success with template object', async(t) => {
 
         await Operations.createPreamble(context);
 
-        t.deepEqual(context.newTemplate, context.template, 'set context.newTemplate');
-        t.deepEqual(context.configNames, ['config'], 'set context.configNames');
-        t.ok(context.create, 'context.create is set to true');
+        assert.deepEqual(context.newTemplate, context.template, 'set context.newTemplate');
+        assert.deepEqual(context.configNames, ['config'], 'set context.configNames');
+        assert.ok(context.create, 'context.create is set to true');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Template.read.restore();
     Lookup.configurations.restore();
-    t.end();
 });
 
-test('[Operations.selectConfig] force-mode', async(t) => {
-    sinon.stub(Prompt, 'configuration').callsFake(() => {
-        t.fail('should not prompt');
+test('[Operations.selectConfig] force-mode', async () => {
+    Sinon.stub(Prompt, 'configuration').callsFake(() => {
+        assert.fail('should not prompt');
         throw new Error('failure');
     });
 
@@ -2046,20 +1955,19 @@ test('[Operations.selectConfig] force-mode', async(t) => {
 
         await Operations.selectConfig(context);
 
-        t.notOk(context.configName, 'does not set context.configName');
+        assert.ok(!(context.configName), 'does not set context.configName');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Prompt.configuration.restore();
-    t.end();
 });
 
-test('[Operations.selectConfig] new config', async(t) => {
+test('[Operations.selectConfig] new config', async () => {
     const context = new CommandContext(opts, 'testing', []);
 
-    sinon.stub(Prompt, 'configuration').callsFake((configs) => {
-        t.deepEqual(configs, context.configNames, 'prompted with correct config names');
+    Sinon.stub(Prompt, 'configuration').callsFake((configs) => {
+        assert.deepEqual(configs, context.configNames, 'prompted with correct config names');
         return Promise.resolve('New configuration');
     });
 
@@ -2068,20 +1976,19 @@ test('[Operations.selectConfig] new config', async(t) => {
 
         await Operations.selectConfig(context);
 
-        t.notOk(context.configName, 'does not set context.configName');
+        assert.ok(!(context.configName), 'does not set context.configName');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Prompt.configuration.restore();
-    t.end();
 });
 
-test('[Operations.selectConfig] saved config', async(t) => {
+test('[Operations.selectConfig] saved config', async () => {
     const context = new CommandContext(opts, 'testing', []);
 
-    sinon.stub(Prompt, 'configuration').callsFake((configs) => {
-        t.deepEqual(configs, context.configNames, 'prompted with correct config names');
+    Sinon.stub(Prompt, 'configuration').callsFake((configs) => {
+        assert.deepEqual(configs, context.configNames, 'prompted with correct config names');
         return Promise.resolve('config');
     });
 
@@ -2090,31 +1997,29 @@ test('[Operations.selectConfig] saved config', async(t) => {
 
         await Operations.selectConfig(context);
 
-        t.equal(context.configName, 'config', 'does set context.configName');
+        assert.equal(context.configName, 'config', 'does set context.configName');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
     Prompt.configuration.restore();
-    t.end();
 });
 
-test('[Operations.loadConfig] no saved config, no default', async(t) => {
+test('[Operations.loadConfig] no saved config, no default', async () => {
     try {
         const context = new CommandContext(opts, 'testing', []);
 
         await Operations.loadConfig(context);
 
-        t.deepEqual(context.oldParameters, {}, 'does not set context.oldParameters');
+        assert.deepEqual(context.oldParameters, {}, 'does not set context.oldParameters');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[Operations.loadConfig] no saved config, has default', async(t) => {
-    sinon.stub(Lookup, 'defaultConfiguration').callsFake((s3url) => {
-        t.equal(s3url, 's3://my-bucket/my-default.cfn.json', 'requested correct configuration');
+test('[Operations.loadConfig] no saved config, has default', async () => {
+    Sinon.stub(Lookup, 'defaultConfiguration').callsFake((s3url) => {
+        assert.equal(s3url, 's3://my-bucket/my-default.cfn.json', 'requested correct configuration');
         return Promise.resolve({ default: 'configuration' });
     });
 
@@ -2124,17 +2029,16 @@ test('[Operations.loadConfig] no saved config, has default', async(t) => {
 
         await Operations.loadConfig(context);
 
-        t.deepEqual(context.oldParameters, { default: 'configuration' }, 'sets context.oldParameters');
+        assert.deepEqual(context.oldParameters, { default: 'configuration' }, 'sets context.oldParameters');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Lookup.defaultConfiguration.restore();
-    t.end();
 });
 
-test('[Operations.loadConfig] bucket not found', async(t) => {
-    sinon.stub(Lookup, 'configuration').callsFake(() => {
+test('[Operations.loadConfig] bucket not found', async () => {
+    Sinon.stub(Lookup, 'configuration').callsFake(() => {
         throw new Lookup.BucketNotFoundError('failure');
     });
 
@@ -2144,18 +2048,17 @@ test('[Operations.loadConfig] bucket not found', async(t) => {
 
         await Operations.loadConfig(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.BucketNotFoundError, 'expected error type');
-        t.equal(err.message, 'Could not find config bucket: failure', 'expected error message');
+        assert.ok(err instanceof Lookup.BucketNotFoundError, 'expected error type');
+        assert.equal(err.message, 'Could not find config bucket: failure', 'expected error message');
     }
 
     Lookup.configuration.restore();
-    t.end();
 });
 
-test('[Operations.loadConfig] config not found', async(t) => {
-    sinon.stub(Lookup, 'configuration').callsFake(() => {
+test('[Operations.loadConfig] config not found', async () => {
+    Sinon.stub(Lookup, 'configuration').callsFake(() => {
         throw new Lookup.ConfigurationNotFoundError('failure');
     });
 
@@ -2165,18 +2068,17 @@ test('[Operations.loadConfig] config not found', async(t) => {
 
         await Operations.loadConfig(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.ConfigurationNotFoundError, 'expected error type');
-        t.equal(err.message, 'Could not find saved configuration: failure', 'expected error message');
+        assert.ok(err instanceof Lookup.ConfigurationNotFoundError, 'expected error type');
+        assert.equal(err.message, 'Could not find saved configuration: failure', 'expected error message');
     }
 
     Lookup.configuration.restore();
-    t.end();
 });
 
-test('[Operations.loadConfig] invalid config', async(t) => {
-    sinon.stub(Lookup, 'configuration').callsFake(() => {
+test('[Operations.loadConfig] invalid config', async () => {
+    Sinon.stub(Lookup, 'configuration').callsFake(() => {
         throw new Lookup.InvalidConfigurationError('failure');
     });
 
@@ -2186,18 +2088,17 @@ test('[Operations.loadConfig] invalid config', async(t) => {
 
         await Operations.loadConfig(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.InvalidConfigurationError, 'expected error type');
-        t.equal(err.message, 'Saved configuration error: failure', 'expected error message');
+        assert.ok(err instanceof Lookup.InvalidConfigurationError, 'expected error type');
+        assert.equal(err.message, 'Saved configuration error: failure', 'expected error message');
     }
 
     Lookup.configuration.restore();
-    t.end();
 });
 
-test('[Operations.loadConfig] failed to load config', async(t) => {
-    sinon.stub(Lookup, 'configuration').callsFake(() => {
+test('[Operations.loadConfig] failed to load config', async () => {
+    Sinon.stub(Lookup, 'configuration').callsFake(() => {
         throw new Lookup.S3Error('failure');
     });
 
@@ -2207,23 +2108,22 @@ test('[Operations.loadConfig] failed to load config', async(t) => {
 
         await Operations.loadConfig(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.S3Error, 'expected error type');
-        t.equal(err.message, 'Failed to read saved configuration: failure', 'expected error message');
+        assert.ok(err instanceof Lookup.S3Error, 'expected error type');
+        assert.equal(err.message, 'Failed to read saved configuration: failure', 'expected error message');
     }
 
     Lookup.configuration.restore();
-    t.end();
 });
 
-test('[Operations.loadConfig] success', async(t) => {
+test('[Operations.loadConfig] success', async () => {
     const context = new CommandContext(opts, 'testing', []);
 
-    sinon.stub(Lookup, 'configuration').callsFake((name, bucket, config) => {
-        t.equal(name, context.baseName, 'expected stack name');
-        t.equal(bucket, context.configBucket, 'expected config bucket');
-        t.equal(config, context.configName, 'expected config name');
+    Sinon.stub(Lookup, 'configuration').callsFake((name, bucket, config) => {
+        assert.equal(name, context.baseName, 'expected stack name');
+        assert.equal(bucket, context.configBucket, 'expected config bucket');
+        assert.equal(config, context.configName, 'expected config name');
         return Promise.resolve({ saved: 'configuration' });
     });
 
@@ -2232,18 +2132,17 @@ test('[Operations.loadConfig] success', async(t) => {
 
         await Operations.loadConfig(context);
 
-        t.deepEqual(context.oldParameters, { saved: 'configuration' }, 'set context.oldParameters');
+        assert.deepEqual(context.oldParameters, { saved: 'configuration' }, 'set context.oldParameters');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Lookup.configuration.restore();
-    t.end();
 });
 
-test('[Operations.confirmCreate] force-mode', async(t) => {
-    sinon.stub(Prompt, 'confirm').callsFake(() => {
-        t.fail('should not prompt');
+test('[Operations.confirmCreate] force-mode', async () => {
+    Sinon.stub(Prompt, 'confirm').callsFake(() => {
+        assert.fail('should not prompt');
         throw new Error('failure');
     });
 
@@ -2253,15 +2152,14 @@ test('[Operations.confirmCreate] force-mode', async(t) => {
 
         await Operations.confirmCreate(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Prompt.confirm.restore();
-    t.end();
 });
 
-test('[Operations.confirmCreate] reject', async(t) => {
-    sinon.stub(Prompt, 'confirm').callsFake(() => {
+test('[Operations.confirmCreate] reject', async () => {
+    Sinon.stub(Prompt, 'confirm').callsFake(() => {
         return Promise.resolve(false);
     });
 
@@ -2271,18 +2169,17 @@ test('[Operations.confirmCreate] reject', async(t) => {
 
         await Operations.confirmCreate(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.equals(err.message, 'aborted');
+        assert.equal(err.message, 'aborted');
     }
 
     Prompt.confirm.restore();
-    t.end();
 });
 
-test('[Operations.confirmCreate] accept', async(t) => {
-    sinon.stub(Prompt, 'confirm').callsFake((message) => {
-        t.equal(message, 'Ready to create the stack?', 'expected message');
+test('[Operations.confirmCreate] accept', async () => {
+    Sinon.stub(Prompt, 'confirm').callsFake((message) => {
+        assert.equal(message, 'Ready to create the stack?', 'expected message');
         return Promise.resolve(true);
     });
 
@@ -2292,30 +2189,28 @@ test('[Operations.confirmCreate] accept', async(t) => {
 
         await Operations.confirmCreate(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Prompt.confirm.restore();
-    t.end();
 });
 
-test('[Operations.confirmDelete] force-mode', async(t) => {
+test('[Operations.confirmDelete] force-mode', async () => {
     try {
         const context = new CommandContext(opts, 'testing', []);
         context.overrides = { force: true },
 
         await Operations.confirmDelete(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[Operations.confirmDelete] reject', async(t) => {
-    sinon.stub(Prompt, 'confirm').callsFake((message, defaultValue) => {
-        t.equal(message, 'Are you sure you want to delete my-stack-testing in region us-east-1?');
-        t.equal(defaultValue, false);
+test('[Operations.confirmDelete] reject', async () => {
+    Sinon.stub(Prompt, 'confirm').callsFake((message, defaultValue) => {
+        assert.equal(message, 'Are you sure you want to delete my-stack-testing in region us-east-1?');
+        assert.equal(defaultValue, false);
         return Promise.resolve(false);
     });
 
@@ -2324,17 +2219,16 @@ test('[Operations.confirmDelete] reject', async(t) => {
 
         await Operations.confirmDelete(context);
     } catch (err) {
-        t.equals(err.message, 'aborted');
+        assert.equal(err.message, 'aborted');
     }
 
     Prompt.confirm.restore();
-    t.end();
 });
 
-test('[Operations.confirmDelete] accept', async(t) => {
-    sinon.stub(Prompt, 'confirm').callsFake((message, defaultValue) => {
-        t.equal(message, 'Are you sure you want to delete my-stack-testing in region us-east-1?', 'expected message');
-        t.equal(defaultValue, false);
+test('[Operations.confirmDelete] accept', async () => {
+    Sinon.stub(Prompt, 'confirm').callsFake((message, defaultValue) => {
+        assert.equal(message, 'Are you sure you want to delete my-stack-testing in region us-east-1?', 'expected message');
+        assert.equal(defaultValue, false);
         return Promise.resolve(true);
     });
 
@@ -2343,15 +2237,14 @@ test('[Operations.confirmDelete] accept', async(t) => {
 
         await Operations.confirmDelete(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Prompt.confirm.restore();
-    t.end();
 });
 
-test('[Operations.deleteStack] failure', async(t) => {
-    sinon.stub(Actions, 'delete').callsFake(() => {
+test('[Operations.deleteStack] failure', async () => {
+    Sinon.stub(Actions, 'delete').callsFake(() => {
         throw new Actions.CloudFormationError('failure');
     });
 
@@ -2360,95 +2253,90 @@ test('[Operations.deleteStack] failure', async(t) => {
 
         await Operations.deleteStack(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Actions.CloudFormationError, 'expected error type');
-        t.equal(err.message, 'Failed to delete stack: failure', 'expected error message');
+        assert.ok(err instanceof Actions.CloudFormationError, 'expected error type');
+        assert.equal(err.message, 'Failed to delete stack: failure', 'expected error message');
     }
 
     Actions.delete.restore();
-    t.end();
 });
 
-test('[Operations.deleteStack] success', async(t) => {
+test('[Operations.deleteStack] success', async () => {
     const context = new CommandContext(opts, 'testing', []);
 
-    sinon.stub(Actions, 'delete').callsFake((name, region) => {
-        t.equal(name, context.stackName, 'deleted expected stack');
-        t.equal(region, context.stackRegion, 'deleted in expected region');
+    Sinon.stub(Actions, 'delete').callsFake((name, region) => {
+        assert.equal(name, context.stackName, 'deleted expected stack');
+        assert.equal(region, context.stackRegion, 'deleted in expected region');
         return Promise.resolve();
     });
 
     try {
         await Operations.deleteStack(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Actions.delete.restore();
-    t.end();
 });
 
-test('[Operations.monitorStack] failure', async(t) => {
+test('[Operations.monitorStack] failure', async () => {
     const context = new CommandContext(opts, 'testing', []);
 
-    sinon.stub(Actions, 'monitor').callsFake(() => {
+    Sinon.stub(Actions, 'monitor').callsFake(() => {
         throw new Actions.CloudFormationError('failure');
     });
 
     try {
         await Operations.monitorStack(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.equal(err.message, `Monitoring your deploy failed, but the deploy in region ${context.stackRegion} will continue. Check on your stack's status in the CloudFormation console.`);
+        assert.equal(err.message, `Monitoring your deploy failed, but the deploy in region ${context.stackRegion} will continue. Check on your stack's status in the CloudFormation console.`);
     }
 
     Actions.monitor.restore();
-    t.end();
 });
 
-test('[Operations.monitorStack] success', async(t) => {
+test('[Operations.monitorStack] success', async () => {
     const context = new CommandContext(opts, 'testing', []);
 
-    sinon.stub(Actions, 'monitor').callsFake((name, region) => {
-        t.equal(name, context.stackName, 'monitor expected stack');
-        t.equal(region, context.stackRegion, 'monitor in expected region');
+    Sinon.stub(Actions, 'monitor').callsFake((name, region) => {
+        assert.equal(name, context.stackName, 'monitor expected stack');
+        assert.equal(region, context.stackRegion, 'monitor in expected region');
         return Promise.resolve();
     });
 
     try {
         await Operations.monitorStack(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Actions.monitor.restore();
-    t.end();
 });
 
-test('[Operations.getOldParameters] missing stack', async(t) => {
+test('[Operations.getOldParameters] missing stack', async () => {
     const context = new CommandContext(opts, 'testing', []);
 
-    sinon.stub(Lookup, 'parameters').callsFake(() => {
+    Sinon.stub(Lookup, 'parameters').callsFake(() => {
         throw new Lookup.StackNotFoundError('failure');
     });
 
     try {
         await Operations.getOldParameters(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.StackNotFoundError, 'expected error type');
-        t.equal(err.message, 'Missing stack: failure', 'expected error message');
+        assert.ok(err instanceof Lookup.StackNotFoundError, 'expected error type');
+        assert.equal(err.message, 'Missing stack: failure', 'expected error message');
     }
 
     Lookup.parameters.restore();
-    t.end();
 });
 
-test('[Operations.getOldParameters] failed to lookup stack', async(t) => {
-    sinon.stub(Lookup, 'parameters').callsFake(() => {
+test('[Operations.getOldParameters] failed to lookup stack', async () => {
+    Sinon.stub(Lookup, 'parameters').callsFake(() => {
         throw new Lookup.CloudFormationError('failure');
     });
 
@@ -2457,43 +2345,41 @@ test('[Operations.getOldParameters] failed to lookup stack', async(t) => {
 
         await Operations.getOldParameters(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.CloudFormationError, 'expected error type');
-        t.equal(err.message, 'Failed to find existing stack: failure', 'expected error message');
+        assert.ok(err instanceof Lookup.CloudFormationError, 'expected error type');
+        assert.equal(err.message, 'Failed to find existing stack: failure', 'expected error message');
     }
 
     Lookup.parameters.restore();
-    t.end();
 });
 
-test('[Operations.getOldParameters] success', async(t) => {
+test('[Operations.getOldParameters] success', async () => {
     const context = new CommandContext(opts, 'testing', []);
 
-    sinon.stub(Lookup, 'parameters').callsFake((name, region) => {
-        t.equal(name, context.stackName, 'lookup expected stack');
-        t.equal(region, context.stackRegion, 'lookup in expected region');
+    Sinon.stub(Lookup, 'parameters').callsFake((name, region) => {
+        assert.equal(name, context.stackName, 'lookup expected stack');
+        assert.equal(region, context.stackRegion, 'lookup in expected region');
         return Promise.resolve({ old: 'parameters' });
     });
 
     try {
         await Operations.getOldParameters(context);
 
-        t.deepEqual(context.oldParameters, { old: 'parameters' }, 'set context.oldParameters');
+        assert.deepEqual(context.oldParameters, { old: 'parameters' }, 'set context.oldParameters');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Lookup.parameters.restore();
-    t.end();
 });
 
-test('[Operations.promptSaveConfig]', async(t) => {
+test('[Operations.promptSaveConfig]', async () => {
     const context = new CommandContext(opts, 'testing', []);
 
-    sinon.stub(Prompt, 'input').callsFake((message, def) => {
-        t.equal(message, 'Name for saved configuration:', 'expected prompt');
-        t.equal(def, context.suffix, 'expected default value');
+    Sinon.stub(Prompt, 'input').callsFake((message, def) => {
+        assert.equal(message, 'Name for saved configuration:', 'expected prompt');
+        assert.equal(def, context.suffix, 'expected default value');
         return Promise.resolve('chuck');
     });
 
@@ -2502,17 +2388,16 @@ test('[Operations.promptSaveConfig]', async(t) => {
 
         await Operations.promptSaveConfig(context);
 
-        t.equal(context.saveName, 'chuck', 'sets context.saveName');
+        assert.equal(context.saveName, 'chuck', 'sets context.saveName');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Prompt.input.restore();
-    t.end();
 });
 
-test('[Operations.confirmSaveConfig] reject', async(t) => {
-    sinon.stub(Prompt, 'confirm').callsFake(() => {
+test('[Operations.confirmSaveConfig] reject', async () => {
+    Sinon.stub(Prompt, 'confirm').callsFake(() => {
         return Promise.resolve(false);
     });
 
@@ -2522,18 +2407,17 @@ test('[Operations.confirmSaveConfig] reject', async(t) => {
 
         await Operations.confirmSaveConfig(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.equals(err.message, 'aborted');
+        assert.equal(err.message, 'aborted');
     }
 
     Prompt.confirm.restore();
-    t.end();
 });
 
-test('[Operations.confirmSaveConfig] accept', async(t) => {
-    sinon.stub(Prompt, 'confirm').callsFake((message) => {
-        t.equal(message, 'Ready to save this configuration as "hello"?', 'expected message');
+test('[Operations.confirmSaveConfig] accept', async () => {
+    Sinon.stub(Prompt, 'confirm').callsFake((message) => {
+        assert.equal(message, 'Ready to save this configuration as "hello"?', 'expected message');
         return Promise.resolve(true);
     });
 
@@ -2544,15 +2428,14 @@ test('[Operations.confirmSaveConfig] accept', async(t) => {
 
         await Operations.confirmSaveConfig(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Prompt.confirm.restore();
-    t.end();
 });
 
-test('[Operations.saveConfig] bucket not found', async(t) => {
-    sinon.stub(Actions, 'saveConfiguration').callsFake(() => {
+test('[Operations.saveConfig] bucket not found', async () => {
+    Sinon.stub(Actions, 'saveConfiguration').callsFake(() => {
         throw new Actions.BucketNotFoundError('failure');
     });
 
@@ -2563,18 +2446,17 @@ test('[Operations.saveConfig] bucket not found', async(t) => {
 
         await Operations.saveConfig(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Actions.BucketNotFoundError, 'expected error type');
-        t.equal(err.message, 'Could not find template bucket: failure');
+        assert.ok(err instanceof Actions.BucketNotFoundError, 'expected error type');
+        assert.equal(err.message, 'Could not find template bucket: failure');
     }
 
     Actions.saveConfiguration.restore();
-    t.end();
 });
 
-test('[Operations.saveConfig] failure', async(t) => {
-    sinon.stub(Actions, 'saveConfiguration').callsFake(() => {
+test('[Operations.saveConfig] failure', async () => {
+    Sinon.stub(Actions, 'saveConfiguration').callsFake(() => {
         throw new Actions.S3Error('failure');
     });
 
@@ -2585,26 +2467,25 @@ test('[Operations.saveConfig] failure', async(t) => {
 
         await Operations.saveConfig(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Actions.S3Error, 'expected error type');
-        t.equal(err.message, 'Failed to save template: failure');
+        assert.ok(err instanceof Actions.S3Error, 'expected error type');
+        assert.equal(err.message, 'Failed to save template: failure');
     }
 
     Actions.saveConfiguration.restore();
-    t.end();
 });
 
-test('[Operations.saveConfig] success', async(t) => {
+test('[Operations.saveConfig] success', async () => {
     const context = new CommandContext(opts, 'testing', []);
 
-    sinon.stub(Actions, 'saveConfiguration').callsFake((baseName, stackName, stackRegion, bucket, parameters, kms) => {
-        t.equal(baseName, context.baseName, 'save under correct stack name');
-        t.equal(stackName, context.stackName, 'save under correct stack name');
-        t.equal(stackRegion, context.stackRegion, 'save under correct stack region');
-        t.equal(bucket, context.configBucket, 'save in correct bucket');
-        t.deepEqual(parameters, { new: 'parameters' }, 'save correct config');
-        t.equal(kms, 'alias/cloudformation', 'use appropriate kms setting');
+    Sinon.stub(Actions, 'saveConfiguration').callsFake((baseName, stackName, stackRegion, bucket, parameters, kms) => {
+        assert.equal(baseName, context.baseName, 'save under correct stack name');
+        assert.equal(stackName, context.stackName, 'save under correct stack name');
+        assert.equal(stackRegion, context.stackRegion, 'save under correct stack region');
+        assert.equal(bucket, context.configBucket, 'save in correct bucket');
+        assert.deepEqual(parameters, { new: 'parameters' }, 'save correct config');
+        assert.equal(kms, 'alias/cloudformation', 'use appropriate kms setting');
         return Promise.resolve();
     });
 
@@ -2614,14 +2495,13 @@ test('[Operations.saveConfig] success', async(t) => {
 
         await Operations.saveConfig(context);
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Actions.saveConfiguration.restore();
-    t.end();
 });
 
-test('[Operations.mergeMetadata]', async(t) => {
+test('[Operations.mergeMetadata]', async () => {
     try {
         const context = new CommandContext(opts, 'testing', []);
         context.stackRegion = 'us-west-2',
@@ -2635,15 +2515,14 @@ test('[Operations.mergeMetadata]', async(t) => {
 
         await Operations.mergeMetadata(context);
 
-        t.deepEqual(context.newTemplate.Metadata, { LastDeploy: 'cooper' });
+        assert.deepEqual(context.newTemplate.Metadata, { LastDeploy: 'cooper' });
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
-    t.end();
 });
 
-test('[Operations.mergeMetadata] error', async(t) => {
+test('[Operations.mergeMetadata] error', async () => {
     try {
         const context = new CommandContext(opts, 'testing', []);
         context.stackRegion = 'us-west-2',
@@ -2657,11 +2536,10 @@ test('[Operations.mergeMetadata] error', async(t) => {
 
         await Operations.mergeMetadata(context);
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.equal(err && err.toString(), 'Error: Metadata.LastDeploy already exists in template');
+        assert.equal(err && err.toString(), 'Error: Metadata.LastDeploy already exists in template');
     }
 
-    t.end();
 });
 */

@@ -3,9 +3,12 @@
         "module": "es2022",
         "esModuleInterop": true,
         "target": "es2022",
+        "declaration": true,
+        "declarationMap": true,
         "noImplicitAny": true,
         "moduleResolution": "node",
         "sourceMap": true,
+        "rootDir": ".",
         "outDir": "./dist",
         "baseUrl": ".",
         "paths": {
@@ -15,6 +18,7 @@
         }
     },
     "include": [
-        "*.ts"
+        "index.ts",
+        "lib/**/*.ts"
     ]
 }

@@ -1,7 +1,9 @@
-import test from 'tape';
-import CFNConfig from '../index.js';
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import CFNConfig, { Commands } from '../index.js';
 
-test('Auth', (t) => {
+
+test('Auth', () => {
     const cfn = new CFNConfig({
         region: 'us-east-1',
         credentials: {
@@ -10,7 +12,7 @@ test('Auth', (t) => {
         }
     });
 
-    t.deepEqual(cfn.client, {
+    assert.deepEqual(cfn.client, {
         region: 'us-east-1',
         credentials: {
             accessKeyId: 'a',
@@ -18,5 +20,8 @@ test('Auth', (t) => {
         }
     }, 'new clients have preauth credentials');
 
-    t.end();
+});
+
+test('Root exports Commands', () => {
+    assert.equal(typeof Commands, 'function', 'package root re-exports Commands');
 });

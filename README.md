@@ -43,17 +43,25 @@ $ npm install --save @openaddresses/cfn-config
 Then, in your scripts:
 
 ```js
-import cfnConfig from '@openaddresses/cfn-config';
+import CFNConfig, { Commands } from '@openaddresses/cfn-config';
 ```
 
 ## JavaScript Usage
 
 High-level prompting routines to create, update, and delete stacks are provided, as well as to fetch detailed information about a stack or to save an existing stack's configuration to S3.
 
-First, create a commands object:
+First, create a client and commands object:
 
 ```js
-import { Commands } from '@openaddresses/cfn-config';
+import CFNConfig, { Commands } from '@openaddresses/cfn-config';
+
+const client = {
+    region: 'us-east-1',
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    }
+};
 
 const options = {
     name: 'my-stack', // the base name of the stack
@@ -67,7 +75,8 @@ const options = {
     }]
 };
 
-const commands = new cfnConfig.Commands(options);
+const commands = new Commands(client, options);
+const cfn = new CFNConfig(client, options);
 ```
 
 Then, perform the desired operation:

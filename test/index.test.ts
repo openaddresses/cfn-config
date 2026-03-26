@@ -12,7 +12,7 @@ const t = {
     error: (error?: unknown) => assert.ifError(error as Error | null | undefined),
     ifError: (error?: unknown) => assert.ifError(error as Error | null | undefined),
     fail: (message?: string) => assert.fail(message),
-    pass: (_message?: string) => {},
+    pass: () => {},
     end: () => {},
 };
 

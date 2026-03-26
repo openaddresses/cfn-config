@@ -1,5 +1,6 @@
 import fs from 'fs';
-import test from 'tape';
+import assert from 'node:assert/strict';
+import test from 'node:test';
 import Sinon from 'sinon';
 import Actions from '../lib/actions.js';
 import {
@@ -14,7 +15,21 @@ import {
 } from '@aws-sdk/client-cloudformation';
 import S3 from '@aws-sdk/client-s3';
 
-test('[actions.cancel] stack does not exist', async (t) => {
+const t = {
+    deepEqual: (actual: unknown, expected: unknown, message?: string) => assert.deepEqual(actual, expected, message),
+    equal: (actual: unknown, expected: unknown, message?: string) => assert.equal(actual, expected, message),
+    equals: (actual: unknown, expected: unknown, message?: string) => assert.equal(actual, expected, message),
+    notEqual: (actual: unknown, expected: unknown, message?: string) => assert.notEqual(actual, expected, message),
+    ok: (value: unknown, message?: string) => assert.ok(value, message),
+    notOk: (value: unknown, message?: string) => assert.ok(!value, message),
+    error: (error?: unknown) => assert.ifError(error as Error | null | undefined),
+    ifError: (error?: unknown) => assert.ifError(error as Error | null | undefined),
+    fail: (message?: string) => assert.fail(message),
+    pass: (_message?: string) => {},
+    end: () => {},
+};
+
+test('[actions.cancel] stack does not exist', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake(() => {
         return Promise.reject(new Error('Stack [my-stack] does not exist'));
     });
@@ -39,7 +54,7 @@ test('[actions.cancel] stack does not exist', async (t) => {
     t.end();
 });
 
-test('[actions.diff] stack does not exist', async(t) => {
+test('[actions.diff] stack does not exist', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake(() => {
         return Promise.reject(new Error('Stack [my-stack] does not exist'));
     });
@@ -64,7 +79,7 @@ test('[actions.diff] stack does not exist', async(t) => {
     t.end();
 });
 
-test('[actions.diff] invalid parameters', async(t) => {
+test('[actions.diff] invalid parameters', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake(() => {
         return Promise.reject(new Error('Parameters: [Pets, Age, Name, LuckyNumbers, SecretPassword] must have values'));
     });
@@ -89,7 +104,7 @@ test('[actions.diff] invalid parameters', async(t) => {
     t.end();
 });
 
-test('[actions.diff] template url does not exist', async(t) => {
+test('[actions.diff] template url does not exist', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake(() => {
         return Promise.reject(new Error('Template file referenced by https://my-bucket.s3.amazonaws.com/my-template.json does not exist.'));
     });
@@ -114,7 +129,7 @@ test('[actions.diff] template url does not exist', async(t) => {
     t.end();
 });
 
-test('[actions.diff] template url is invalid', async(t) => {
+test('[actions.diff] template url is invalid', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake(() => {
         return Promise.reject(new Error('The specified url must be an Amazon S3 URL.'));
     });
@@ -139,7 +154,7 @@ test('[actions.diff] template url is invalid', async(t) => {
     t.end();
 });
 
-test('[actions.diff] template is invalid', async(t) => {
+test('[actions.diff] template is invalid', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake(() => {
         return Promise.reject(new Error('Template format error: At least one Resources member must be defined.'));
     });
@@ -164,7 +179,7 @@ test('[actions.diff] template is invalid', async(t) => {
     t.end();
 });
 
-test('[actions.diff] createChangeSet error on wrong changeSetType', async(t) => {
+test('[actions.diff] createChangeSet error on wrong changeSetType', async () => {
     const url = 'https://my-bucket.s3.amazonaws.com/my-template.json';
 
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake(() => {
@@ -192,7 +207,7 @@ test('[actions.diff] createChangeSet error on wrong changeSetType', async(t) => 
     t.end();
 });
 
-test('[actions.diff] unexpected createChangeSet error', async(t) => {
+test('[actions.diff] unexpected createChangeSet error', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake(() => {
         return Promise.reject(new Error('unexpected'));
     });
@@ -218,7 +233,7 @@ test('[actions.diff] unexpected createChangeSet error', async(t) => {
     t.end();
 });
 
-test('[actions.diff] unexpected describeChangeSet error', async(t) => {
+test('[actions.diff] unexpected describeChangeSet error', async () => {
     const url = 'https://my-bucket.s3.amazonaws.com/my-template.json';
 
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
@@ -250,7 +265,7 @@ test('[actions.diff] unexpected describeChangeSet error', async(t) => {
     t.end();
 });
 
-test('[actions.diff] changeset failed to create', async(t) => {
+test('[actions.diff] changeset failed to create', async () => {
     const url = 'https://my-bucket.s3.amazonaws.com/my-template.json';
 
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
@@ -295,7 +310,7 @@ test('[actions.diff] changeset failed to create', async(t) => {
     t.end();
 });
 
-test('[actions.diff] success', async(t) => {
+test('[actions.diff] success', async () => {
     const url = 'https://my-bucket.s3.amazonaws.com/my-template.json';
     let changesetId: string;
     let polled = 0;
@@ -457,7 +472,7 @@ test('[actions.diff] success', async(t) => {
     t.end();
 });
 
-test('[actions.executeChangeSet] describeChangeSet error', async(t) => {
+test('[actions.executeChangeSet] describeChangeSet error', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof DescribeChangeSetCommand) {
             return Promise.reject(new Error('unexpected'));
@@ -483,7 +498,7 @@ test('[actions.executeChangeSet] describeChangeSet error', async(t) => {
     t.end();
 });
 
-test('[actions.executeChangeSet] changeset not executable', async(t) => {
+test('[actions.executeChangeSet] changeset not executable', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof DescribeChangeSetCommand) {
             return Promise.resolve({
@@ -516,7 +531,7 @@ test('[actions.executeChangeSet] changeset not executable', async(t) => {
     t.end();
 });
 
-test('[actions.executeChangeSet] executeChangeSet error', async(t) => {
+test('[actions.executeChangeSet] executeChangeSet error', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof DescribeChangeSetCommand) {
             return Promise.resolve({
@@ -547,7 +562,7 @@ test('[actions.executeChangeSet] executeChangeSet error', async(t) => {
     t.end();
 });
 
-test('[actions.executeChangeSet] success', async(t) => {
+test('[actions.executeChangeSet] success', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof DescribeChangeSetCommand) {
             t.deepEqual(command.input, {
@@ -588,7 +603,7 @@ test('[actions.executeChangeSet] success', async(t) => {
     t.end();
 });
 
-test('[actions.delete] stack does not exist', async(t) => {
+test('[actions.delete] stack does not exist', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof DeleteStackCommand) {
             const err: any = new Error('Stack [my-stack] does not exist');
@@ -618,7 +633,7 @@ test('[actions.delete] stack does not exist', async(t) => {
 });
 
 
-test('[actions.delete] unexpected cloudformation error', async(t) => {
+test('[actions.delete] unexpected cloudformation error', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof DeleteStackCommand) {
             return Promise.reject(new Error('unexpected'));
@@ -644,7 +659,7 @@ test('[actions.delete] unexpected cloudformation error', async(t) => {
     t.end();
 });
 
-test('[actions.delete] success', async (t) => {
+test('[actions.delete] success', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof DeleteStackCommand) {
             t.deepEqual(command.input, { StackName: 'my-stack' }, 'deleteStack with expected params');
@@ -670,7 +685,7 @@ test('[actions.delete] success', async (t) => {
     t.end();
 });
 
-test('[actions.validate] unexpected validateTemplate error', async(t) => {
+test('[actions.validate] unexpected validateTemplate error', async () => {
     const url = 'https://my-bucket.s3.amazonaws.com/my-template.json';
 
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
@@ -699,7 +714,7 @@ test('[actions.validate] unexpected validateTemplate error', async(t) => {
     t.end();
 });
 
-test('[actions.validate] invalid template', async(t) => {
+test('[actions.validate] invalid template', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof ValidateTemplateCommand) {
             const err: any = new Error('Unresolved resource dependencies [Name] in the Outputs block of the template');
@@ -727,7 +742,7 @@ test('[actions.validate] invalid template', async(t) => {
     t.end();
 });
 
-test('[actions.validate] valid template', async(t) => {
+test('[actions.validate] valid template', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof ValidateTemplateCommand) {
             t.deepEqual(command.input, {
@@ -756,7 +771,7 @@ test('[actions.validate] valid template', async(t) => {
     t.end();
 });
 
-test('[actions.saveConfiguration] bucket does not exist', async(t) => {
+test('[actions.saveConfiguration] bucket does not exist', async () => {
     const parameters: Map<string, string> = new Map([
         ['Name', 'Chuck'],
         ['Age', '18'],
@@ -795,7 +810,7 @@ test('[actions.saveConfiguration] bucket does not exist', async(t) => {
     t.end();
 });
 
-test('[actions.saveConfiguration] unexpected putObject error', async(t) => {
+test('[actions.saveConfiguration] unexpected putObject error', async () => {
     const parameters: Map<string, string> = new Map([
         ['Name', 'Chuck'],
         ['Age', '18'],
@@ -832,7 +847,7 @@ test('[actions.saveConfiguration] unexpected putObject error', async(t) => {
     t.end();
 });
 
-test('[actions.saveConfiguration] success', async(t) => {
+test('[actions.saveConfiguration] success', async () => {
     const parameters: Map<string, string> = new Map([
         ['Name', 'Chuck'],
         ['Age', '18'],
@@ -874,7 +889,7 @@ test('[actions.saveConfiguration] success', async(t) => {
     t.end();
 });
 
-test('[actions.saveConfiguration] success without encryption', async(t) => {
+test('[actions.saveConfiguration] success without encryption', async () => {
     const parameters: Map<string, string> = new Map([
         ['Name', 'Chuck'],
         ['Age', '18'],
@@ -916,7 +931,7 @@ test('[actions.saveConfiguration] success without encryption', async(t) => {
     t.end();
 });
 
-test('[actions.saveConfiguration] config bucket in a different region', async(t) => {
+test('[actions.saveConfiguration] config bucket in a different region', async () => {
     const parameters: Map<string, string> = new Map([
         ['Name', 'Chuck'],
         ['Age', '18'],
@@ -958,7 +973,7 @@ test('[actions.saveConfiguration] config bucket in a different region', async(t)
     t.end();
 });
 
-test('[actions.templateUrl] us-east-1', async (t) => {
+test('[actions.templateUrl] us-east-1', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-2')
@@ -980,7 +995,7 @@ test('[actions.templateUrl] us-east-1', async (t) => {
     t.end();
 });
 
-test('[actions.templateUrl] cn-north-1', async (t) => {
+test('[actions.templateUrl] cn-north-1', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve({
@@ -1005,7 +1020,7 @@ test('[actions.templateUrl] cn-north-1', async (t) => {
     t.end();
 });
 
-test('[actions.templateUrl] eu-central-1', async (t) => {
+test('[actions.templateUrl] eu-central-1', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve({
@@ -1029,7 +1044,7 @@ test('[actions.templateUrl] eu-central-1', async (t) => {
     t.end();
 });
 
-test('[actions.saveTemplate] bucket does not exist', async(t) => {
+test('[actions.saveTemplate] bucket does not exist', async () => {
     const url = 'https://map-bucket.s3.us-east-1.amazonaws.com/cirjpj94c0000s5nzc1j452o7-my-stack.template.json';
     const template = String(fs.readFileSync(new URL('./fixtures/template.json', import.meta.url)));
 
@@ -1059,7 +1074,7 @@ test('[actions.saveTemplate] bucket does not exist', async(t) => {
     t.end();
 });
 
-test('[actions.saveTemplate] s3 error', async(t) => {
+test('[actions.saveTemplate] s3 error', async () => {
     const url = 'https://my-bucket.s3.us-east-1.amazonaws.com/cirjpj94c0000s5nzc1j452o7-my-stack.template.json';
     const template = String(fs.readFileSync(new URL('./fixtures/template.json', import.meta.url)));
 
@@ -1087,7 +1102,7 @@ test('[actions.saveTemplate] s3 error', async(t) => {
     t.end();
 });
 
-test('[actions.saveTemplate] us-east-1', async(t) => {
+test('[actions.saveTemplate] us-east-1', async () => {
     const url = 'https://my-bucket.s3.us-east-1.amazonaws.com/cirjpj94c0000s5nzc1j452o7-my-stack.template.json';
     const template = String(fs.readFileSync(new URL('./fixtures/template.json', import.meta.url)));
 
@@ -1121,7 +1136,7 @@ test('[actions.saveTemplate] us-east-1', async(t) => {
     t.end();
 });
 
-test('[actions.saveTemplate] needs whitespace removal', async(t) => {
+test('[actions.saveTemplate] needs whitespace removal', async () => {
     const url = 'https://my-bucket.s3.us-east-1.amazonaws.com/cirjpj94c0000s5nzc1j452o7-my-stack.template.json';
     // @ts-expect-error Untyped Code
     const template = (await import('./fixtures/huge-template.js')).default;
@@ -1156,7 +1171,7 @@ test('[actions.saveTemplate] needs whitespace removal', async(t) => {
     t.end();
 });
 
-test('[actions.saveTemplate] cn-north-1', async(t) => {
+test('[actions.saveTemplate] cn-north-1', async () => {
     const url = 'https://my-bucket.s3.cn-north-1.amazonaws.com.cn/cirjpj94c0000s5nzc1j452o7-my-stack.template.json';
     const template = String(fs.readFileSync(new URL('./fixtures/template.json', import.meta.url)));
 
@@ -1190,7 +1205,7 @@ test('[actions.saveTemplate] cn-north-1', async(t) => {
     t.end();
 });
 
-test('[actions.saveTemplate] eu-central-1', async(t) => {
+test('[actions.saveTemplate] eu-central-1', async () => {
     const url = 'https://my-bucket.s3.eu-central-1.amazonaws.com/cirjpj94c0000s5nzc1j452o7-my-stack.template.json';
     const template = String(fs.readFileSync(new URL('./fixtures/template.json', import.meta.url)));
 
@@ -1224,7 +1239,7 @@ test('[actions.saveTemplate] eu-central-1', async(t) => {
     t.end();
 });
 
-test('[actions.monitor] error', async(t) => {
+test('[actions.monitor] error', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof DescribeStackEventsCommand) {
             return Promise.reject(new Error('failure'));

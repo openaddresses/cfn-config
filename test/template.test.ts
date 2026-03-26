@@ -1,12 +1,27 @@
-import test from 'tape';
+import assert from 'node:assert/strict';
+import test from 'node:test';
 import TemplateReader, { Template } from '../lib/template.js';
 import fs from 'fs';
 import Sinon from 'sinon';
 import S3 from '@aws-sdk/client-s3';
 
+const t = {
+    deepEqual: (actual: unknown, expected: unknown, message?: string) => assert.deepEqual(actual, expected, message),
+    equal: (actual: unknown, expected: unknown, message?: string) => assert.equal(actual, expected, message),
+    equals: (actual: unknown, expected: unknown, message?: string) => assert.equal(actual, expected, message),
+    notEqual: (actual: unknown, expected: unknown, message?: string) => assert.notEqual(actual, expected, message),
+    ok: (value: unknown, message?: string) => assert.ok(value, message),
+    notOk: (value: unknown, message?: string) => assert.ok(!value, message),
+    error: (error?: unknown) => assert.ifError(error as Error | null | undefined),
+    ifError: (error?: unknown) => assert.ifError(error as Error | null | undefined),
+    fail: (message?: string) => assert.fail(message),
+    pass: (_message?: string) => {},
+    end: () => {},
+};
+
 const expected = JSON.parse(String(fs.readFileSync(new URL('./fixtures/template.json', import.meta.url))));
 
-test('[template.read] local file does not exist', async(t) => {
+test('[template.read] local file does not exist', async () => {
     try {
         const tr = new TemplateReader({
             region: 'us-east-1',
@@ -21,7 +36,7 @@ test('[template.read] local file does not exist', async(t) => {
     t.end();
 });
 
-test('[template.read] local file cannot be parsed', async(t) => {
+test('[template.read] local file cannot be parsed', async () => {
     try {
         const tr = new TemplateReader({
             region: 'us-east-1',
@@ -37,7 +52,7 @@ test('[template.read] local file cannot be parsed', async(t) => {
     t.end();
 });
 
-test('[template.read] local js file cannot be parsed', async(t) => {
+test('[template.read] local js file cannot be parsed', async () => {
     try {
         const tr = new TemplateReader({
             region: 'us-east-1',
@@ -53,7 +68,7 @@ test('[template.read] local js file cannot be parsed', async(t) => {
     t.end();
 });
 
-test('[template.read] S3 no access', async(t) => {
+test('[template.read] S3 no access', async () => {
     try {
         const tr = new TemplateReader({
             region: 'us-east-1',
@@ -68,7 +83,7 @@ test('[template.read] S3 no access', async(t) => {
     t.end();
 });
 
-test('[template.read] S3 bucket does not exist', async(t) => {
+test('[template.read] S3 bucket does not exist', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         t.ok(command instanceof S3.GetBucketLocationCommand);
         t.deepEqual(command.input, { Bucket: 'my' }, 'requested bucket location');
@@ -92,7 +107,7 @@ test('[template.read] S3 bucket does not exist', async(t) => {
     t.end();
 });
 
-test('[template.read] S3 file does not exist', async(t) => {
+test('[template.read] S3 file does not exist', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetObjectCommand) {
             t.deepEqual(command.input, { Bucket: 'my', Key: 'template' }, 'requested correct S3 object');
@@ -120,7 +135,7 @@ test('[template.read] S3 file does not exist', async(t) => {
     t.end();
 });
 
-test('[template.read] S3 file cannot be parsed', async(t) => {
+test('[template.read] S3 file cannot be parsed', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetObjectCommand) {
             t.deepEqual(command.input, { Bucket: 'my', Key: 'template' }, 'requested correct S3 object');
@@ -147,7 +162,7 @@ test('[template.read] S3 file cannot be parsed', async(t) => {
     t.end();
 });
 
-test('[template.read] local JSON', async(t) => {
+test('[template.read] local JSON', async () => {
     try {
         const tr = new TemplateReader({
             region: 'us-east-1',
@@ -162,7 +177,7 @@ test('[template.read] local JSON', async(t) => {
     t.end();
 });
 
-test('[template.read] local sync JS', async(t) => {
+test('[template.read] local sync JS', async () => {
     try {
         const tr = new TemplateReader({
             region: 'us-east-1',
@@ -177,7 +192,7 @@ test('[template.read] local sync JS', async(t) => {
     t.end();
 });
 
-test('[template.read] local async JS with options', async(t) => {
+test('[template.read] local async JS with options', async () => {
     try {
         const tr = new TemplateReader({
             region: 'us-east-1',
@@ -197,7 +212,7 @@ test('[template.read] local async JS with options', async(t) => {
     t.end();
 });
 
-test('[template.read] local async JS without options', async(t) => {
+test('[template.read] local async JS without options', async () => {
     try {
         const tr = new TemplateReader({
             region: 'us-east-1',
@@ -216,7 +231,7 @@ test('[template.read] local async JS without options', async(t) => {
     t.end();
 });
 
-test('[template.read] S3 JSON', async (t) => {
+test('[template.read] S3 JSON', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetObjectCommand) {
             t.deepEqual(command.input, { Bucket: 'my', Key: 'template' }, 'requested correct S3 object');
@@ -242,7 +257,7 @@ test('[template.read] S3 JSON', async (t) => {
     t.end();
 });
 
-test('[template.questions] provides expected questions without encryption', async (t) => {
+test('[template.questions] provides expected questions without encryption', async () => {
     const tr = new TemplateReader({
         region: 'us-east-1',
         credentials: { accessKeyId: '-', secretAccessKey: '-' }
@@ -299,7 +314,7 @@ test('[template.questions] provides expected questions without encryption', asyn
     t.end();
 });
 
-test('[template.questions] no parameters', (t) => {
+test('[template.questions] no parameters', () => {
     const tr = new TemplateReader({
         region: 'us-east-1',
         credentials: { accessKeyId: '-', secretAccessKey: '-' }
@@ -309,7 +324,7 @@ test('[template.questions] no parameters', (t) => {
     t.end();
 });
 
-test('[template.questions] reject defaults that are not in a list of allowed values', (t) => {
+test('[template.questions] reject defaults that are not in a list of allowed values', () => {
     const parameters = { List: { Type: 'String', AllowedValues: ['one', 'two'] } };
     const overrides = new Map();
     overrides.set('defaults', { List: 'three' });

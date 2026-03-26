@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file. For change 
 ## 7.5.0 - 2025-05-03
 - :bug: Switch to new S3 REST API to support regions created after 2022
 
+## Unreleased
+- :bug: Publish generated declaration files from dist and point package metadata at them
+- :bug: Re-export documented root module APIs for consumers using named imports
+
 ## 7.4.2 - 2024-05-17
 - :bug: Ensure UpdatePreamble also fills description
 

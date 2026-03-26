@@ -1,4 +1,5 @@
-import test from 'tape';
+import assert from 'node:assert/strict';
+import test from 'node:test';
 import Stream from '../lib/cfstream.js';
 import {
     CloudFormationClient,
@@ -7,7 +8,21 @@ import {
 } from '@aws-sdk/client-cloudformation';
 import Sinon from 'sinon';
 
-test('emits an error for a non-existent stack', (t) => {
+const t = {
+    deepEqual: (actual: unknown, expected: unknown, message?: string) => assert.deepEqual(actual, expected, message),
+    equal: (actual: unknown, expected: unknown, message?: string) => assert.equal(actual, expected, message),
+    equals: (actual: unknown, expected: unknown, message?: string) => assert.equal(actual, expected, message),
+    notEqual: (actual: unknown, expected: unknown, message?: string) => assert.notEqual(actual, expected, message),
+    ok: (value: unknown, message?: string) => assert.ok(value, message),
+    notOk: (value: unknown, message?: string) => assert.ok(!value, message),
+    error: (error?: unknown) => assert.ifError(error as Error | null | undefined),
+    ifError: (error?: unknown) => assert.ifError(error as Error | null | undefined),
+    fail: (message?: string) => assert.fail(message),
+    pass: (_message?: string) => {},
+    end: () => {},
+};
+
+test('emits an error for a non-existent stack', () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake(() => {
         return Promise.reject(new Error('No Stack Found'));
     });
@@ -29,7 +44,7 @@ test('emits an error for a non-existent stack', (t) => {
         });
 });
 
-test('streams events until stack is complete', { timeout: 120000 }, (t) => {
+test('streams events until stack is complete', { timeout: 120000 }, () => {
     const events = [
         'CREATE_IN_PROGRESS AWS::CloudFormation::Stack',
         'CREATE_IN_PROGRESS AWS::SNS::Topic',

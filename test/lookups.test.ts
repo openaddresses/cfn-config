@@ -1,14 +1,29 @@
 import fs from 'node:fs';
 import { Readable } from 'node:stream';
-import test from 'tape';
+import assert from 'node:assert/strict';
+import test from 'node:test';
 import Lookup from '../lib/lookup.js';
 import CloudFormation from '@aws-sdk/client-cloudformation';
 import S3 from '@aws-sdk/client-s3';
 import Sinon from 'sinon';
 
+const t = {
+    deepEqual: (actual: unknown, expected: unknown, message?: string) => assert.deepEqual(actual, expected, message),
+    equal: (actual: unknown, expected: unknown, message?: string) => assert.equal(actual, expected, message),
+    equals: (actual: unknown, expected: unknown, message?: string) => assert.equal(actual, expected, message),
+    notEqual: (actual: unknown, expected: unknown, message?: string) => assert.notEqual(actual, expected, message),
+    ok: (value: unknown, message?: string) => assert.ok(value, message),
+    notOk: (value: unknown, message?: string) => assert.ok(!value, message),
+    error: (error?: unknown) => assert.ifError(error as Error | null | undefined),
+    ifError: (error?: unknown) => assert.ifError(error as Error | null | undefined),
+    fail: (message?: string) => assert.fail(message),
+    pass: (_message?: string) => {},
+    end: () => {},
+};
+
 const template = JSON.parse(String(fs.readFileSync(new URL('./fixtures/template.json', import.meta.url))));
 
-test('[lookup.info] describeStacks error', async(t) => {
+test('[lookup.info] describeStacks error', async () => {
     Sinon.stub(CloudFormation.CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof CloudFormation.DescribeStacksCommand) {
             return Promise.reject(new Error('cloudformation failed'));
@@ -32,7 +47,7 @@ test('[lookup.info] describeStacks error', async(t) => {
     t.end();
 });
 
-test('[lookup.info] stack does not exist', async(t) => {
+test('[lookup.info] stack does not exist', async () => {
     Sinon.stub(CloudFormation.CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof CloudFormation.DescribeStacksCommand) {
             const err: any = new Error('Stack with id my-stack does not exist');
@@ -57,7 +72,7 @@ test('[lookup.info] stack does not exist', async(t) => {
     t.end();
 });
 
-test('[lookup.info] stack info not returned', async(t) => {
+test('[lookup.info] stack info not returned', async () => {
     Sinon.stub(CloudFormation.CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof CloudFormation.DescribeStacksCommand) {
             return Promise.resolve({
@@ -82,7 +97,7 @@ test('[lookup.info] stack info not returned', async(t) => {
     t.end();
 });
 
-test('[lookup.info] success', async(t) => {
+test('[lookup.info] success', async () => {
     const date = new Date();
 
     const stackInfo = {
@@ -162,7 +177,7 @@ test('[lookup.info] success', async(t) => {
     t.end();
 });
 
-test('[lookup.info] with resources', async(t) => {
+test('[lookup.info] with resources', async () => {
     const stack = [
         { StackResourceSummaries: [{ resource1: 'ohai' }], NextToken: '1' },
         { StackResourceSummaries: [{ resource2: 'ohai' }], NextToken: null }
@@ -198,7 +213,7 @@ test('[lookup.info] with resources', async(t) => {
     t.end();
 });
 
-test('[lookup.info] resource lookup failure', async(t) => {
+test('[lookup.info] resource lookup failure', async () => {
     Sinon.stub(CloudFormation.CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof CloudFormation.DescribeStacksCommand) {
             return Promise.resolve({
@@ -225,7 +240,7 @@ test('[lookup.info] resource lookup failure', async(t) => {
     t.end();
 });
 
-test('[lookup.parameters] lookup.info error', async(t) => {
+test('[lookup.parameters] lookup.info error', async () => {
     Sinon.stub(CloudFormation.CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof CloudFormation.DescribeStacksCommand) {
             return Promise.resolve({ Stacks: [] });
@@ -248,7 +263,7 @@ test('[lookup.parameters] lookup.info error', async(t) => {
     t.end();
 });
 
-test('[lookup.parameters] success', async(t) => {
+test('[lookup.parameters] success', async () => {
     const stackInfo = {
         StackId: 'stack-id',
         StackName: 'my-stack',
@@ -309,7 +324,7 @@ test('[lookup.parameters] success', async(t) => {
     t.end();
 });
 
-test('[lookup.template] getTemplate error', async(t) => {
+test('[lookup.template] getTemplate error', async () => {
     Sinon.stub(CloudFormation.CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof CloudFormation.GetTemplateCommand) {
             return Promise.reject(new Error('cloudformation failed'));
@@ -331,7 +346,7 @@ test('[lookup.template] getTemplate error', async(t) => {
     t.end();
 });
 
-test('[lookup.template] stack does not exist', async(t) => {
+test('[lookup.template] stack does not exist', async () => {
     Sinon.stub(CloudFormation.CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof CloudFormation.GetTemplateCommand) {
             const err: any = new Error('Stack with id my-stack does not exist');
@@ -355,7 +370,7 @@ test('[lookup.template] stack does not exist', async(t) => {
     t.end();
 });
 
-test('[lookup.template] success', async (t) => {
+test('[lookup.template] success', async () => {
     Sinon.stub(CloudFormation.CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof CloudFormation.GetTemplateCommand) {
             t.deepEqual(command.input, {
@@ -385,7 +400,7 @@ test('[lookup.template] success', async (t) => {
     t.end();
 });
 
-test('[lookup.configurations] bucket location error', async(t) => {
+test('[lookup.configurations] bucket location error', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.reject(new Error('failure'));
@@ -407,7 +422,7 @@ test('[lookup.configurations] bucket location error', async(t) => {
     t.end();
 });
 
-test('[lookup.configurations] bucket does not exist', async(t) => {
+test('[lookup.configurations] bucket does not exist', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-1')
@@ -433,7 +448,7 @@ test('[lookup.configurations] bucket does not exist', async(t) => {
     t.end();
 });
 
-test('[lookup.configurations] S3 error', async(t) => {
+test('[lookup.configurations] S3 error', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-1')
@@ -458,7 +473,7 @@ test('[lookup.configurations] S3 error', async(t) => {
     t.end();
 });
 
-test('[lookup.configurations] no saved configs found', async(t) => {
+test('[lookup.configurations] no saved configs found', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-1')
@@ -485,7 +500,7 @@ test('[lookup.configurations] no saved configs found', async(t) => {
     t.end();
 });
 
-test('[lookup.configurations] found multiple saved configs', async(t) => {
+test('[lookup.configurations] found multiple saved configs', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-1')
@@ -520,7 +535,7 @@ test('[lookup.configurations] found multiple saved configs', async(t) => {
     t.end();
 });
 
-test('[lookup.configurations] region specified', async(t) => {
+test('[lookup.configurations] region specified', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-1')
@@ -546,7 +561,7 @@ test('[lookup.configurations] region specified', async(t) => {
     t.end();
 });
 
-test('[lookup.configuration] bucket location error', async(t) => {
+test('[lookup.configuration] bucket location error', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.reject('failure');
@@ -568,7 +583,7 @@ test('[lookup.configuration] bucket location error', async(t) => {
     t.end();
 });
 
-test('[lookup.configuration] bucket does not exist', async(t) => {
+test('[lookup.configuration] bucket does not exist', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-');
@@ -594,7 +609,7 @@ test('[lookup.configuration] bucket does not exist', async(t) => {
     t.end();
 });
 
-test('[lookup.configuration] S3 error', async(t) => {
+test('[lookup.configuration] S3 error', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-');
@@ -621,7 +636,7 @@ test('[lookup.configuration] S3 error', async(t) => {
     t.end();
 });
 
-test('[lookup.configuration] requested configuration does not exist', async(t) => {
+test('[lookup.configuration] requested configuration does not exist', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-');
@@ -648,7 +663,7 @@ test('[lookup.configuration] requested configuration does not exist', async(t) =
     t.end();
 });
 
-test('[lookup.configuration] cannot parse object data', async(t) => {
+test('[lookup.configuration] cannot parse object data', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-');
@@ -674,7 +689,7 @@ test('[lookup.configuration] cannot parse object data', async(t) => {
     t.end();
 });
 
-test('[lookup.configuration] success', async(t) => {
+test('[lookup.configuration] success', async () => {
     const info = {
         Name: 'Chuck',
         Age: 18,
@@ -714,7 +729,7 @@ test('[lookup.configuration] success', async(t) => {
     t.end();
 });
 
-test('[lookup.defaultConfiguration] bucket location error', async(t) => {
+test('[lookup.defaultConfiguration] bucket location error', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.reject(new Error('failure'));
@@ -736,7 +751,7 @@ test('[lookup.defaultConfiguration] bucket location error', async(t) => {
     t.end();
 });
 
-test('[lookup.defaultConfiguration] requested configuration does not exist', async(t) => {
+test('[lookup.defaultConfiguration] requested configuration does not exist', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-')
@@ -762,7 +777,7 @@ test('[lookup.defaultConfiguration] requested configuration does not exist', asy
     t.end();
 });
 
-test('[lookup.defaultConfiguration] cannot parse object data', async(t) => {
+test('[lookup.defaultConfiguration] cannot parse object data', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-')
@@ -788,7 +803,7 @@ test('[lookup.defaultConfiguration] cannot parse object data', async(t) => {
     t.end();
 });
 
-test('[lookup.defaultConfiguration] success', async(t) => {
+test('[lookup.defaultConfiguration] success', async () => {
     const info = {
         Name: 'Chuck',
         Age: 18,
@@ -828,7 +843,7 @@ test('[lookup.defaultConfiguration] success', async(t) => {
     t.end();
 });
 
-test('[lookup.bucketRegion] no bucket', async(t) => {
+test('[lookup.bucketRegion] no bucket', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
             const err: any = new Error('failure');
@@ -852,7 +867,7 @@ test('[lookup.bucketRegion] no bucket', async(t) => {
     t.end();
 });
 
-test('[lookup.bucketRegion] failure', async(t) => {
+test('[lookup.bucketRegion] failure', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.reject(new Error('failure'));
@@ -874,7 +889,7 @@ test('[lookup.bucketRegion] failure', async(t) => {
     t.end();
 });
 
-test('[lookup.bucketRegion] no bucket', async(t) => {
+test('[lookup.bucketRegion] no bucket', async () => {
     Sinon.stub(S3.S3Client.prototype, 'send').callsFake((command) => {
         if (command instanceof S3.GetBucketLocationCommand) {
             const err: any = new Error('failure');

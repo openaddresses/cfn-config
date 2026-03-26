@@ -11,6 +11,16 @@ import type {
     Provider,
 } from '@aws-sdk/types';
 
+export { default as Actions } from './lib/actions.js';
+export type { ChangeSetDetail, ChangeSetDetailChange } from './lib/actions.js';
+export { Commands } from './lib/commands.js';
+export type { CommandOptions, CommandOverrides } from './lib/commands.js';
+export { default as Lookup } from './lib/lookup.js';
+export type { InfoOutput } from './lib/lookup.js';
+export { default as Prompt } from './lib/prompt.js';
+export { Template, default as TemplateReader } from './lib/template.js';
+export type { CloudFormationTemplate } from './lib/template.js';
+
 export interface CFNConfigClient {
     region: string;
     credentials: AwsCredentialIdentity | Provider<AwsCredentialIdentity>;

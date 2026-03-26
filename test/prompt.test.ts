@@ -1,9 +1,24 @@
-import test from 'tape';
+import assert from 'node:assert/strict';
+import test from 'node:test';
 import Sinon from 'sinon';
 import inquirer from 'inquirer';
 import prompt from '../lib/prompt.js';
 
-test('[prompt.confirm] single-line, confirm', async(t) => {
+const t = {
+    deepEqual: (actual: unknown, expected: unknown, message?: string) => assert.deepEqual(actual, expected, message),
+    equal: (actual: unknown, expected: unknown, message?: string) => assert.equal(actual, expected, message),
+    equals: (actual: unknown, expected: unknown, message?: string) => assert.equal(actual, expected, message),
+    notEqual: (actual: unknown, expected: unknown, message?: string) => assert.notEqual(actual, expected, message),
+    ok: (value: unknown, message?: string) => assert.ok(value, message),
+    notOk: (value: unknown, message?: string) => assert.ok(!value, message),
+    error: (error?: unknown) => assert.ifError(error as Error | null | undefined),
+    ifError: (error?: unknown) => assert.ifError(error as Error | null | undefined),
+    fail: (message?: string) => assert.fail(message),
+    pass: (_message?: string) => {},
+    end: () => {},
+};
+
+test('[prompt.confirm] single-line, confirm', async () => {
     Sinon.stub(inquirer, 'prompt').callsFake((questions) => {
         t.deepEqual(questions, {
             default: true,
@@ -26,7 +41,7 @@ test('[prompt.confirm] single-line, confirm', async(t) => {
     t.end();
 });
 
-test('[prompt.confirm] single-line, false default', async(t) => {
+test('[prompt.confirm] single-line, false default', async () => {
     Sinon.stub(inquirer, 'prompt').callsFake((questions) => {
         t.deepEqual(questions, {
             type: 'confirm',
@@ -49,7 +64,7 @@ test('[prompt.confirm] single-line, false default', async(t) => {
     t.end();
 });
 
-test('[prompt.confirm] multi-line, reject', async(t) => {
+test('[prompt.confirm] multi-line, reject', async () => {
     Sinon.stub(inquirer, 'prompt').callsFake((questions) => {
         t.deepEqual(questions, {
             default: true,
@@ -72,7 +87,7 @@ test('[prompt.confirm] multi-line, reject', async(t) => {
     t.end();
 });
 
-test('[prompt.configuration] success', async(t) => {
+test('[prompt.configuration] success', async () => {
     Sinon.stub(inquirer, 'prompt').callsFake((questions) => {
         t.deepEqual(questions, {
             type: 'list',
@@ -95,7 +110,7 @@ test('[prompt.configuration] success', async(t) => {
     t.end();
 });
 
-test('[prompt.parameters] success', async(t) => {
+test('[prompt.parameters] success', async () => {
     Sinon.stub(inquirer, 'prompt').callsFake((questions) => {
         t.deepEqual(questions, {
             questions: 'passed through'
@@ -118,7 +133,7 @@ test('[prompt.parameters] success', async(t) => {
     t.end();
 });
 
-test('[prompt.input] no default value', async(t) => {
+test('[prompt.input] no default value', async () => {
     Sinon.stub(inquirer, 'prompt').callsFake((questions) => {
         t.deepEqual(questions, {
             type: 'input',
@@ -141,7 +156,7 @@ test('[prompt.input] no default value', async(t) => {
     t.end();
 });
 
-test('[prompt.input] with default value', async(t) => {
+test('[prompt.input] with default value', async () => {
     Sinon.stub(inquirer, 'prompt').callsFake((questions) => {
         t.deepEqual(questions, {
             type: 'input',

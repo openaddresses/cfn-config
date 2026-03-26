@@ -7,19 +7,6 @@ import CloudFormation from '@aws-sdk/client-cloudformation';
 import S3 from '@aws-sdk/client-s3';
 import Sinon from 'sinon';
 
-const t = {
-    deepEqual: (actual: unknown, expected: unknown, message?: string) => assert.deepEqual(actual, expected, message),
-    equal: (actual: unknown, expected: unknown, message?: string) => assert.equal(actual, expected, message),
-    equals: (actual: unknown, expected: unknown, message?: string) => assert.equal(actual, expected, message),
-    notEqual: (actual: unknown, expected: unknown, message?: string) => assert.notEqual(actual, expected, message),
-    ok: (value: unknown, message?: string) => assert.ok(value, message),
-    notOk: (value: unknown, message?: string) => assert.ok(!value, message),
-    error: (error?: unknown) => assert.ifError(error as Error | null | undefined),
-    ifError: (error?: unknown) => assert.ifError(error as Error | null | undefined),
-    fail: (message?: string) => assert.fail(message),
-    pass: () => {},
-    end: () => {},
-};
 
 const template = JSON.parse(String(fs.readFileSync(new URL('./fixtures/template.json', import.meta.url))));
 
@@ -38,13 +25,12 @@ test('[lookup.info] describeStacks error', async () => {
 
         await lookup.info('my-stack');
 
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.CloudFormationError, 'expected error returned');
+        assert.ok(err instanceof Lookup.CloudFormationError, 'expected error returned');
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.info] stack does not exist', async () => {
@@ -63,13 +49,12 @@ test('[lookup.info] stack does not exist', async () => {
         })
 
         await lookup.info('my-stack');
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.StackNotFoundError, 'expected error returned');
+        assert.ok(err instanceof Lookup.StackNotFoundError, 'expected error returned');
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.info] stack info not returned', async () => {
@@ -88,13 +73,12 @@ test('[lookup.info] stack info not returned', async () => {
         })
 
         await lookup.info('my-stack');
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.StackNotFoundError, 'expected error returned');
+        assert.ok(err instanceof Lookup.StackNotFoundError, 'expected error returned');
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.info] success', async () => {
@@ -168,13 +152,12 @@ test('[lookup.info] success', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         const info = await lookup.info('my-stack');
-        t.deepEqual(info, expected, 'expected info returned');
+        assert.deepEqual(info, expected, 'expected info returned');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.info] with resources', async () => {
@@ -201,16 +184,15 @@ test('[lookup.info] with resources', async () => {
 
         const info = await lookup.info('my-stack', true);
 
-        t.deepEqual(info.StackResources, [
+        assert.deepEqual(info.StackResources, [
             { resource1: 'ohai' },
             { resource2: 'ohai' }
         ], 'added stack resources');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.info] resource lookup failure', async () => {
@@ -231,13 +213,12 @@ test('[lookup.info] resource lookup failure', async () => {
         })
 
         await lookup.info('my-stack', true);
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.CloudFormationError, 'expected error returned');
+        assert.ok(err instanceof Lookup.CloudFormationError, 'expected error returned');
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.parameters] lookup.info error', async () => {
@@ -254,13 +235,12 @@ test('[lookup.parameters] lookup.info error', async () => {
         })
 
         await lookup.parameters('my-stack');
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.StackNotFoundError, 'expected error returned');
+        assert.ok(err instanceof Lookup.StackNotFoundError, 'expected error returned');
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.parameters] success', async () => {
@@ -315,13 +295,12 @@ test('[lookup.parameters] success', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         const info = await lookup.parameters('my-stack');
-        t.deepEqual(info, expected, 'expected parameters returned');
+        assert.deepEqual(info, expected, 'expected parameters returned');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.template] getTemplate error', async () => {
@@ -337,13 +316,12 @@ test('[lookup.template] getTemplate error', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         await lookup.template('my-stack');
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.CloudFormationError, 'expected error returned');
+        assert.ok(err instanceof Lookup.CloudFormationError, 'expected error returned');
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.template] stack does not exist', async () => {
@@ -361,19 +339,18 @@ test('[lookup.template] stack does not exist', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         await lookup.template('my-stack');
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.StackNotFoundError, 'expected error returned');
+        assert.ok(err instanceof Lookup.StackNotFoundError, 'expected error returned');
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.template] success', async () => {
     Sinon.stub(CloudFormation.CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof CloudFormation.GetTemplateCommand) {
-            t.deepEqual(command.input, {
+            assert.deepEqual(command.input, {
                 StackName: 'my-stack',
                 TemplateStage: 'Original'
             }, 'getTemplate call sets the TemplateStage');
@@ -391,13 +368,12 @@ test('[lookup.template] success', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         const body = await lookup.template('my-stack');
-        t.deepEqual(body.body, template, 'expected template body returned');
+        assert.deepEqual(body.body, template, 'expected template body returned');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.configurations] bucket location error', async () => {
@@ -413,13 +389,12 @@ test('[lookup.configurations] bucket location error', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         await lookup.configurations('my-stack', 'my-bucket');
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.S3Error, 'expected error returned');
+        assert.ok(err instanceof Lookup.S3Error, 'expected error returned');
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.configurations] bucket does not exist', async () => {
@@ -439,13 +414,12 @@ test('[lookup.configurations] bucket does not exist', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         await lookup.configurations('my-stack', 'my-bucket');
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.BucketNotFoundError, 'expected error returned');
+        assert.ok(err instanceof Lookup.BucketNotFoundError, 'expected error returned');
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.configurations] S3 error', async () => {
@@ -453,7 +427,7 @@ test('[lookup.configurations] S3 error', async () => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-1')
         } else if (command instanceof S3.ListObjectsCommand) {
-            t.equal(command.input.Prefix, 'my-stack/', 'listObjects called with proper prefix');
+            assert.equal(command.input.Prefix, 'my-stack/', 'listObjects called with proper prefix');
             return Promise.reject(new Error('something unexpected'));
         }
     });
@@ -464,13 +438,12 @@ test('[lookup.configurations] S3 error', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         await lookup.configurations('my-stack', 'my-bucket');
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.S3Error, 'expected error returned');
+        assert.ok(err instanceof Lookup.S3Error, 'expected error returned');
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.configurations] no saved configs found', async () => {
@@ -478,7 +451,7 @@ test('[lookup.configurations] no saved configs found', async () => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-1')
         } else if (command instanceof S3.ListObjectsCommand) {
-            t.equal(command.input.Prefix, 'my-stack/', 'listObjects called with proper prefix');
+            assert.equal(command.input.Prefix, 'my-stack/', 'listObjects called with proper prefix');
             return Promise.resolve({
                 Contents: []
             });
@@ -491,13 +464,12 @@ test('[lookup.configurations] no saved configs found', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         const configs = await lookup.configurations('my-stack', 'my-bucket');
-        t.deepEqual(configs, [], 'expected empty array of configs');
+        assert.deepEqual(configs, [], 'expected empty array of configs');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.configurations] found multiple saved configs', async () => {
@@ -505,7 +477,7 @@ test('[lookup.configurations] found multiple saved configs', async () => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-1')
         } else if (command instanceof S3.ListObjectsCommand) {
-            t.equal(command.input.Prefix, 'my-stack/', 'listObjects called with proper prefix');
+            assert.equal(command.input.Prefix, 'my-stack/', 'listObjects called with proper prefix');
             return Promise.resolve({
                 Contents: [
                     { Key: 'my-stack/staging.cfn.json', Size: 10 },
@@ -523,16 +495,15 @@ test('[lookup.configurations] found multiple saved configs', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         const configs = await lookup.configurations('my-stack', 'my-bucket');
-        t.deepEqual(configs, [
+        assert.deepEqual(configs, [
             'staging',
             'production'
         ], 'expected array of configs');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.configurations] region specified', async () => {
@@ -540,7 +511,7 @@ test('[lookup.configurations] region specified', async () => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-1')
         } else if (command instanceof S3.ListObjectsCommand) {
-            t.equal(command.input.Prefix, 'my-stack/', 'listObjects called with proper prefix');
+            assert.equal(command.input.Prefix, 'my-stack/', 'listObjects called with proper prefix');
             return Promise.resolve({
                 Contents: []
             });
@@ -554,11 +525,10 @@ test('[lookup.configurations] region specified', async () => {
         })
         await lookup.configurations('my-stack', 'my-bucket');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.configuration] bucket location error', async () => {
@@ -574,13 +544,12 @@ test('[lookup.configuration] bucket location error', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         await lookup.configuration('my-stack', 'my-bucket', 'my-stack-staging-us-east-1');
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.S3Error, 'expected error returned');
+        assert.ok(err instanceof Lookup.S3Error, 'expected error returned');
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.configuration] bucket does not exist', async () => {
@@ -600,13 +569,12 @@ test('[lookup.configuration] bucket does not exist', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         await lookup.configuration('my-stack', 'my-bucket', 'my-stack-staging-us-east-1');
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.BucketNotFoundError, 'expected error returned');
+        assert.ok(err instanceof Lookup.BucketNotFoundError, 'expected error returned');
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.configuration] S3 error', async () => {
@@ -614,7 +582,7 @@ test('[lookup.configuration] S3 error', async () => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-');
         } else if (command instanceof S3.GetObjectCommand) {
-            t.equal(command.input.Key, 'my-stack/my-stack-staging-us-east-1.cfn.json', 'getObject called with proper key');
+            assert.equal(command.input.Key, 'my-stack/my-stack-staging-us-east-1.cfn.json', 'getObject called with proper key');
             const err: any = new Error('The specified bucket does not exist');
             err.code = 'NoSuchBucket';
             return Promise.reject(err);
@@ -627,13 +595,12 @@ test('[lookup.configuration] S3 error', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         await lookup.configuration('my-stack', 'my-bucket', 'my-stack-staging-us-east-1');
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.BucketNotFoundError, 'expected error returned');
+        assert.ok(err instanceof Lookup.BucketNotFoundError, 'expected error returned');
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.configuration] requested configuration does not exist', async () => {
@@ -641,7 +608,7 @@ test('[lookup.configuration] requested configuration does not exist', async () =
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-');
         } else if (command instanceof S3.GetObjectCommand) {
-            t.equal(command.input.Key, 'my-stack/my-stack-staging-us-east-1.cfn.json', 'getObject called with proper key');
+            assert.equal(command.input.Key, 'my-stack/my-stack-staging-us-east-1.cfn.json', 'getObject called with proper key');
             const err: any = new Error('The specified key does not exist');
             err.code = 'NoSuchKey';
             return Promise.reject(err);
@@ -654,13 +621,12 @@ test('[lookup.configuration] requested configuration does not exist', async () =
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         await lookup.configuration('my-stack', 'my-bucket', 'my-stack-staging-us-east-1');
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.ConfigurationNotFoundError, 'expected error returned');
+        assert.ok(err instanceof Lookup.ConfigurationNotFoundError, 'expected error returned');
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.configuration] cannot parse object data', async () => {
@@ -680,13 +646,12 @@ test('[lookup.configuration] cannot parse object data', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         await lookup.configuration('my-stack', 'my-bucket', 'my-stack-staging-us-east-1');
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.InvalidConfigurationError, 'expected error returned');
+        assert.ok(err instanceof Lookup.InvalidConfigurationError, 'expected error returned');
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.configuration] success', async () => {
@@ -703,7 +668,7 @@ test('[lookup.configuration] success', async () => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-');
         } else if (command instanceof S3.GetObjectCommand) {
-            t.deepEqual(command.input, {
+            assert.deepEqual(command.input, {
                 Bucket: 'my-bucket',
                 Key: 'my-stack/my-stack-staging-us-east-1.cfn.json'
             }, 'requested expected configuration');
@@ -720,13 +685,12 @@ test('[lookup.configuration] success', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         const configuration = await lookup.configuration('my-stack', 'my-bucket', 'my-stack-staging-us-east-1');
-        t.deepEqual(configuration, new Map(Object.entries(info)), 'returned expected stack info');
+        assert.deepEqual(configuration, new Map(Object.entries(info)), 'returned expected stack info');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.defaultConfiguration] bucket location error', async () => {
@@ -742,13 +706,12 @@ test('[lookup.defaultConfiguration] bucket location error', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         const info = await lookup.defaultConfiguration('s3://my-bucket/my-config.cfn.json');
-        t.deepEqual(info, {}, 'provided blank info');
+        assert.deepEqual(info, {}, 'provided blank info');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.defaultConfiguration] requested configuration does not exist', async () => {
@@ -768,13 +731,12 @@ test('[lookup.defaultConfiguration] requested configuration does not exist', asy
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         const info = await lookup.defaultConfiguration('s3://my-bucket/my-config.cfn.json');
-        t.deepEqual(info, {}, 'provided blank info');
+        assert.deepEqual(info, {}, 'provided blank info');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.defaultConfiguration] cannot parse object data', async () => {
@@ -794,13 +756,12 @@ test('[lookup.defaultConfiguration] cannot parse object data', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         const info = await lookup.defaultConfiguration('s3://my-bucket/my-config.cfn.json');
-        t.deepEqual(info, {}, 'provided blank info');
+        assert.deepEqual(info, {}, 'provided blank info');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.defaultConfiguration] success', async () => {
@@ -817,7 +778,7 @@ test('[lookup.defaultConfiguration] success', async () => {
         if (command instanceof S3.GetBucketLocationCommand) {
             return Promise.resolve('us-east-')
         } else if (command instanceof S3.GetObjectCommand) {
-            t.deepEqual(command.input, {
+            assert.deepEqual(command.input, {
                 Bucket: 'my-bucket',
                 Key: 'my-config.cfn.json'
             }, 'requested expected default configuration');
@@ -834,13 +795,12 @@ test('[lookup.defaultConfiguration] success', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         const configuration = await lookup.defaultConfiguration('s3://my-bucket/my-config.cfn.json');
-        t.deepEqual(configuration, info, 'returned expected stack info');
+        assert.deepEqual(configuration, info, 'returned expected stack info');
     } catch (err) {
-        t.error(err);
+        assert.ifError(err);
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.bucketRegion] no bucket', async () => {
@@ -858,13 +818,12 @@ test('[lookup.bucketRegion] no bucket', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         await lookup.bucketRegion('my-bucket');
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.BucketNotFoundError, 'expected error type');
+        assert.ok(err instanceof Lookup.BucketNotFoundError, 'expected error type');
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.bucketRegion] failure', async () => {
@@ -880,13 +839,12 @@ test('[lookup.bucketRegion] failure', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         await lookup.bucketRegion('my-bucket');
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.S3Error, 'expected error type');
+        assert.ok(err instanceof Lookup.S3Error, 'expected error type');
     }
 
     Sinon.restore();
-    t.end();
 });
 
 test('[lookup.bucketRegion] no bucket', async () => {
@@ -904,11 +862,10 @@ test('[lookup.bucketRegion] no bucket', async () => {
             credentials: { accessKeyId: '-', secretAccessKey: '-' }
         })
         await lookup.bucketRegion('my-bucket');
-        t.fail();
+        assert.fail();
     } catch (err) {
-        t.ok(err instanceof Lookup.BucketNotFoundError, 'expected error type');
+        assert.ok(err instanceof Lookup.BucketNotFoundError, 'expected error type');
     }
 
     Sinon.restore();
-    t.end();
 });

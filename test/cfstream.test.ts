@@ -8,19 +8,6 @@ import {
 } from '@aws-sdk/client-cloudformation';
 import Sinon from 'sinon';
 
-const t = {
-    deepEqual: (actual: unknown, expected: unknown, message?: string) => assert.deepEqual(actual, expected, message),
-    equal: (actual: unknown, expected: unknown, message?: string) => assert.equal(actual, expected, message),
-    equals: (actual: unknown, expected: unknown, message?: string) => assert.equal(actual, expected, message),
-    notEqual: (actual: unknown, expected: unknown, message?: string) => assert.notEqual(actual, expected, message),
-    ok: (value: unknown, message?: string) => assert.ok(value, message),
-    notOk: (value: unknown, message?: string) => assert.ok(!value, message),
-    error: (error?: unknown) => assert.ifError(error as Error | null | undefined),
-    ifError: (error?: unknown) => assert.ifError(error as Error | null | undefined),
-    fail: (message?: string) => assert.fail(message),
-    pass: () => {},
-    end: () => {},
-};
 
 test('emits an error for a non-existent stack', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake(() => {
@@ -40,9 +27,8 @@ test('emits an error for a non-existent stack', async () => {
             })
             .on('error', (err) => {
                 try {
-                    t.ok(err.message.includes('No Stack Found'));
+                    assert.ok(err.message.includes('No Stack Found'));
                     Sinon.restore();
-                    t.end();
                     resolve();
                 } catch (assertionError) {
                     reject(assertionError);
@@ -122,7 +108,7 @@ test('streams events until stack is complete', { timeout: 120000 }, async () => 
         Stream(stackName)
             .on('data', (e) => {
                 try {
-                    t.equal(events[0], e.ResourceStatus + ' ' + e.ResourceType, e.ResourceStatus + ' ' + e.ResourceType);
+                    assert.equal(events[0], e.ResourceStatus + ' ' + e.ResourceType, e.ResourceStatus + ' ' + e.ResourceType);
                     events.shift();
                 } catch (assertionError) {
                     reject(assertionError);
@@ -131,9 +117,8 @@ test('streams events until stack is complete', { timeout: 120000 }, async () => 
             .on('error', reject)
             .on('end', () => {
                 try {
-                    if (events.length) t.fail('Events still remain');
+                    if (events.length) assert.fail('Events still remain');
                     Sinon.restore();
-                    t.end();
                     resolve();
                 } catch (assertionError) {
                     reject(assertionError);

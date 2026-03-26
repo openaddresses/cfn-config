@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file. For change log formatting, see http://keepachangelog.com/
 
+## 8.0.0 - 2026-03-25
+- :rocket: Additional TypeScript migrations and type exports
+
 ## 7.5.0 - 2025-05-03
 - :bug: Switch to new S3 REST API to support regions created after 2022
 

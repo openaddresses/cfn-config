@@ -141,6 +141,27 @@ test('[commands.update] with template object', async () => {
 
 });
 
+test('[commands.update] with driftAware override', async () => {
+    const cmd = new Commands({
+        region: 'us-east-1',
+        credentials: { accessKeyId: '-', secretAccessKey: '-' }
+    }, opts, true);
+
+    try {
+        const context = await cmd.update('testing', 'templatePath', { driftAware: true });
+
+        assert.equal(context.operations.length, 11, '11 operations are run');
+        assert.deepEqual(context.config, opts, 'instantiate context with expected config');
+        assert.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
+        assert.equal(context.template, 'templatePath', 'set context.template');
+        assert.equal(context.driftAware, true, 'sets context.driftAware to true');
+        assert.deepEqual(context.tags, [{ Key: 'developer', Value: 'ingalls' }], 'set context.tags');
+    } catch (err) {
+        assert.ifError(err);
+    }
+
+});
+
 test('[commands.delete] no overrides', async () => {
     const cmd = new Commands({
         region: 'us-east-1',

@@ -31,6 +31,7 @@ export interface CommandOptions {
 
 export interface CommandOverrides {
     parameters?: Map<string, string>;
+    driftAware?: boolean;
 }
 
 interface CommandDiffs {
@@ -246,6 +247,7 @@ class CommandContext {
     changesetParameters?: Parameter[];
     diffs: CommandDiffs;
     description: string;
+    driftAware: boolean;
     saveName?: string;
     configNames?: string[];
     configName?: string;
@@ -282,6 +284,8 @@ class CommandContext {
         this.overrides = {
             parameters: overrides.parameters || new Map()
         }
+
+        this.driftAware = overrides.driftAware || false;
 
         this.operations = operations;
     }
@@ -453,7 +457,9 @@ class Operations {
                 changeSetType,
                 context.templateUrl,
                 context.changesetParameters,
-                context.tags
+                context.tags,
+                false,
+                context.driftAware
             );
 
             context.changeset = details;

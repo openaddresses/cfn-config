@@ -12,6 +12,7 @@ import {
     Parameter,
     Capability,
     ChangeSetType,
+    DeploymentMode,
     CloudFormationClient,
     CreateChangeSetCommand,
     CreateChangeSetCommandInput,
@@ -96,9 +97,9 @@ export default class Actions {
      * @param Tags - Tags to be applied to all resources in the stack
      * @param expand - Set CAPABILITY_AUTO_EXPAND
      */
-    async diff(name: string, desc: string, changeSetType: ChangeSetType, templateUrl: string, parameters: Parameter[], tags: Tag[], expand = false): Promise<ChangeSetDetail> {
+    async diff(name: string, desc: string, changeSetType: ChangeSetType, templateUrl: string, parameters: Parameter[], tags: Tag[], expand = false, driftAware = false): Promise<ChangeSetDetail> {
         const cfn = new CloudFormationClient(this.client);
-        const changeSetParameters = changeSet(name, desc, changeSetType, templateUrl, parameters, expand, tags);
+        const changeSetParameters = changeSet(name, desc, changeSetType, templateUrl, parameters, expand, tags, driftAware);
 
         try {
             await cfn.send(new CreateChangeSetCommand(changeSetParameters));
@@ -403,7 +404,8 @@ function changeSet(
     TemplateURL: string,
     Parameters: Parameter[],
     expand: boolean,
-    Tags: Tag[] = []
+    Tags: Tag[] = [],
+    driftAware = false
 ): CreateChangeSetCommandInput {
     const ChangeSetName = 'a' + crypto.randomBytes(16).toString('hex');
 
@@ -422,6 +424,7 @@ function changeSet(
     };
 
     if (expand) base.Capabilities.push(Capability.CAPABILITY_AUTO_EXPAND);
+    if (driftAware) base.DeploymentMode = DeploymentMode.REVERT_DRIFT;
 
     return base;
 }

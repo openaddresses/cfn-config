@@ -448,6 +448,43 @@ test('[actions.diff] success', async () => {
     Sinon.restore();
 });
 
+test('[actions.diff] drift-aware changeset sets ImportExistingResources', async () => {
+    const url = 'https://my-bucket.s3.amazonaws.com/my-template.json';
+    let capturedInput: Record<string, unknown>;
+
+    Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
+        if (command instanceof CreateChangeSetCommand) {
+            capturedInput = command.input;
+            return Promise.resolve({ Id: 'changeset:arn' });
+        } else if (command instanceof DescribeChangeSetCommand) {
+            return Promise.resolve({
+                ChangeSetName: command.input.ChangeSetName,
+                ExecutionStatus: 'AVAILABLE',
+                Status: 'CREATE_COMPLETE',
+                Changes: []
+            });
+        }
+    });
+
+    const actions = new Actions({
+        region: 'us-east-1',
+        credentials: {
+            accessKeyId: '123',
+            secretAccessKey: '321'
+        }
+    });
+
+    try {
+        await actions.diff('my-stack', 'Stack Description', 'UPDATE', url, [], [], false, true);
+
+        assert.equal(capturedInput.DeploymentMode, 'REVERT_DRIFT', 'DeploymentMode is set to REVERT_DRIFT for drift-aware changeset');
+    } catch (err) {
+        assert.ifError(err);
+    }
+
+    Sinon.restore();
+});
+
 test('[actions.executeChangeSet] describeChangeSet error', async () => {
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof DescribeChangeSetCommand) {

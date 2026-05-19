@@ -298,7 +298,7 @@ export default class Actions {
         const uri = url.parse(templateUrl);
 
         const regionMatch = (uri.host ?? '').match(/\.s3\.(dualstack\.)?(.*?)\.amazonaws\.com/);
-        const region = regionMatch ? regionMatch[0] : 'us-east-1';
+        const region = regionMatch ? regionMatch[2] : 'us-east-1';
 
         // If the template is too large, remove excess whitespace/indentation
         if (templateBody.length > 460800) {
@@ -428,7 +428,7 @@ function changeSet(
     };
 
     if (expand) base.Capabilities!.push(Capability.CAPABILITY_AUTO_EXPAND);
-    if (driftAware) base.DeploymentMode = DeploymentMode.REVERT_DRIFT;
+    if (driftAware && ChangeSetType === 'UPDATE') base.DeploymentMode = DeploymentMode.REVERT_DRIFT;
 
     return base;
 }

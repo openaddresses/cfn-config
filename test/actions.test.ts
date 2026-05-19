@@ -448,7 +448,7 @@ test('[actions.diff] success', async () => {
     Sinon.restore();
 });
 
-test('[actions.diff] drift-aware changeset sets ImportExistingResources', async () => {
+test('[actions.diff] drift-aware changeset sets DeploymentMode', async () => {
     const url = 'https://my-bucket.s3.amazonaws.com/my-template.json';
     let capturedInput: CreateChangeSetCommandInput;
 

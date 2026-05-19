@@ -399,7 +399,9 @@ class Operations {
         context.templateUrl = await actions.templateUrl(context.templateBucket, context.suffix);
 
         try {
-            await actions.saveTemplate(context.templateUrl!, stableStringify(context.newTemplate.body, { space: 2 }) ?? '');
+            const templateBody = stableStringify(context.newTemplate.body, { space: 2 });
+            if (templateBody === undefined) throw new Error('Failed to serialize template body');
+            await actions.saveTemplate(context.templateUrl!, templateBody);
         } catch (err) {
             let msg = '';
             if (err instanceof Actions.BucketNotFoundError) msg += 'Could not find template bucket: ';

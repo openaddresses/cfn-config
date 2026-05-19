@@ -105,15 +105,15 @@ export default class Lookup {
             Region: this.client.region,
             Capabilities: data.Stacks[0].Capabilities || [],
             Parameters: (data.Stacks[0].Parameters || []).reduce((memo, param) => {
-                memo.set(param.ParameterKey ?? '', param.ParameterValue);
+                if (param.ParameterKey !== undefined) memo.set(param.ParameterKey, param.ParameterValue);
                 return memo;
             }, new Map()),
             Outputs: (data.Stacks[0].Outputs || []).reduce((memo, output) => {
-                memo.set(output.OutputKey ?? '', output.OutputValue);
+                if (output.OutputKey !== undefined) memo.set(output.OutputKey, output.OutputValue);
                 return memo;
             }, new Map()),
             Tags: (data.Stacks[0].Tags || []).reduce((memo, output) => {
-                memo.set(output.Key ?? '', output.Value);
+                if (output.Key !== undefined) memo.set(output.Key, output.Value);
                 return memo;
             }, new Map())
         };

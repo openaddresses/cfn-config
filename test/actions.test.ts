@@ -11,8 +11,8 @@ import {
     ValidateTemplateCommand,
     ExecuteChangeSetCommand,
     DescribeStackEventsCommand
-
 } from '@aws-sdk/client-cloudformation';
+import type { CreateChangeSetCommandInput } from '@aws-sdk/client-cloudformation';
 import S3 from '@aws-sdk/client-s3';
 
 
@@ -289,12 +289,12 @@ test('[actions.diff] changeset failed to create', async () => {
 
 test('[actions.diff] success', async () => {
     const url = 'https://my-bucket.s3.amazonaws.com/my-template.json';
-    let changesetId: string;
+    let changesetId = '';
     let polled = 0;
 
     Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
         if (command instanceof CreateChangeSetCommand) {
-            assert.ok(/^[\w\d-]{1,128}$/.test(command.input.ChangeSetName), 'createChangeSet valid change set name');
+            assert.ok(/^[\w\d-]{1,128}$/.test(command.input.ChangeSetName!), 'createChangeSet valid change set name');
             assert.deepEqual(command.input, {
                 ChangeSetName: command.input.ChangeSetName,
                 ChangeSetType: 'UPDATE',
@@ -316,7 +316,7 @@ test('[actions.diff] success', async () => {
                 }]
             }, 'createChangeSet expected parameters');
 
-            changesetId = command.input.ChangeSetName;
+            changesetId = command.input.ChangeSetName!;
             return Promise.resolve({ Id: 'changeset:arn' });
         } else if (command instanceof DescribeChangeSetCommand) {
             polled++;
@@ -441,6 +441,43 @@ test('[actions.diff] success', async () => {
                 }
             ]
         }, 'returned changeset details');
+    } catch (err) {
+        assert.ifError(err);
+    }
+
+    Sinon.restore();
+});
+
+test('[actions.diff] drift-aware changeset sets DeploymentMode', async () => {
+    const url = 'https://my-bucket.s3.amazonaws.com/my-template.json';
+    let capturedInput: CreateChangeSetCommandInput;
+
+    Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
+        if (command instanceof CreateChangeSetCommand) {
+            capturedInput = command.input;
+            return Promise.resolve({ Id: 'changeset:arn' });
+        } else if (command instanceof DescribeChangeSetCommand) {
+            return Promise.resolve({
+                ChangeSetName: command.input.ChangeSetName,
+                ExecutionStatus: 'AVAILABLE',
+                Status: 'CREATE_COMPLETE',
+                Changes: []
+            });
+        }
+    });
+
+    const actions = new Actions({
+        region: 'us-east-1',
+        credentials: {
+            accessKeyId: '123',
+            secretAccessKey: '321'
+        }
+    });
+
+    try {
+        await actions.diff('my-stack', 'Stack Description', 'UPDATE', url, [], [], false, true);
+
+        assert.equal(capturedInput!.DeploymentMode, 'REVERT_DRIFT', 'DeploymentMode is set to REVERT_DRIFT for drift-aware changeset');
     } catch (err) {
         assert.ifError(err);
     }

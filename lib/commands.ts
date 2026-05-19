@@ -13,7 +13,8 @@ import type { ChangeSetDetail, ChangeSetDetailChange } from './actions.js';
 import Lookup from './lookup.js';
 import Prompt from './prompt.js';
 import TemplateReader from './template.js';
-import { Template, CloudFormationTemplate } from './template.js';
+import { Template } from './template.js';
+import type { CloudFormationTemplate } from './template.js';
 import type {
     Tag,
     Parameter
@@ -31,6 +32,7 @@ export interface CommandOptions {
 
 export interface CommandOverrides {
     parameters?: Map<string, string>;
+    driftAware?: boolean;
 }
 
 interface CommandDiffs {
@@ -186,7 +188,7 @@ class Commands {
     async info(suffix: string, resources = false) {
         if (this.dryrun) return true;
         const lookup = new Lookup(this.client);
-        return await lookup.info(stackName(this.config.name, suffix), resources);
+        return await lookup.info(stackName(this.config.name!, suffix), resources);
     }
 
     /**
@@ -233,7 +235,7 @@ class CommandContext {
     baseName: string;
     suffix: string;
     stackName: string;
-    stackRegion: string;
+    stackRegion?: string;
     configBucket: string;
     templateBucket: string;
     oldTemplate: Template;
@@ -246,6 +248,7 @@ class CommandContext {
     changesetParameters?: Parameter[];
     diffs: CommandDiffs;
     description: string;
+    driftAware: boolean;
     saveName?: string;
     configNames?: string[];
     configName?: string;
@@ -265,11 +268,11 @@ class CommandContext {
     ) {
         this.client = client;
         this.config = config;
-        this.baseName = config.name;
+        this.baseName = config.name!;
         this.suffix = suffix;
-        this.stackName = stackName(config.name, suffix);
-        this.configBucket = config.configBucket;
-        this.templateBucket = config.templateBucket;
+        this.stackName = stackName(config.name!, suffix);
+        this.configBucket = config.configBucket!;
+        this.templateBucket = config.templateBucket!;
         this.diffs = {};
         this.tags = config.tags || [];
 
@@ -282,6 +285,8 @@ class CommandContext {
         this.overrides = {
             parameters: overrides.parameters || new Map()
         }
+
+        this.driftAware = overrides.driftAware || false;
 
         this.operations = operations;
     }
@@ -359,7 +364,7 @@ class Operations {
         context.changesetParameters = changesetParameters(
             context.oldTemplate.parameters,
             context.newTemplate.parameters,
-            context.create
+            context.create ?? false
         );
 
         return;
@@ -394,7 +399,9 @@ class Operations {
         context.templateUrl = await actions.templateUrl(context.templateBucket, context.suffix);
 
         try {
-            await actions.saveTemplate(context.templateUrl, stableStringify(context.newTemplate.body, { space: 2 }));
+            const templateBody = stableStringify(context.newTemplate.body, { space: 2 });
+            if (templateBody === undefined) throw new Error('Failed to serialize template body');
+            await actions.saveTemplate(context.templateUrl!, templateBody);
         } catch (err) {
             let msg = '';
             if (err instanceof Actions.BucketNotFoundError) msg += 'Could not find template bucket: ';
@@ -424,7 +431,7 @@ class Operations {
     static async validateTemplate(context: CommandContext) {
         const actions = new Actions(context.client);
         try {
-            await actions.validate(context.templateUrl);
+            await actions.validate(context.templateUrl!);
         } catch (err) {
             let msg = 'Invalid template: '; // err instanceof Actions.CloudFormationError
             msg += err.message;
@@ -451,9 +458,11 @@ class Operations {
                 context.stackName,
                 context.description,
                 changeSetType,
-                context.templateUrl,
-                context.changesetParameters,
-                context.tags
+                context.templateUrl!,
+                context.changesetParameters!,
+                context.tags,
+                false,
+                context.driftAware
             );
 
             context.changeset = details;
@@ -467,7 +476,7 @@ class Operations {
 
     static async confirmChangeset(context: CommandContext) {
         const msg = [
-            formatDiff(context.changeset),
+            formatDiff(context.changeset!),
             'Accept changes and update the stack?'
         ].join('\n');
 
@@ -478,7 +487,7 @@ class Operations {
     static async executeChangeSet(context: CommandContext) {
         const actions = new Actions(context.client);
         try {
-            await actions.executeChangeSet(context.stackName, context.changeset.id);
+            await actions.executeChangeSet(context.stackName, context.changeset!.id);
         } catch (err) {
             let msg = '';
             if (err instanceof Actions.CloudFormationError) msg += 'Failed to execute changeset: ';
@@ -524,7 +533,7 @@ class Operations {
     }
 
     static async selectConfig(context: CommandContext) {
-        const savedConfig = await Prompt.configuration(context.configNames);
+        const savedConfig = await Prompt.configuration(context.configNames || []);
         if (savedConfig === 'New configuration') return;
 
         context.configName = savedConfig;
@@ -650,8 +659,8 @@ function compareParameters(existing: Template, desired: Template) {
 }
 
 function compareTemplate(existing: Template, desired: Template) {
-    const existingstr = stableStringify(existing.body, { space: 2 });
-    const desiredstr = stableStringify(desired.body, { space: 2 });
+    const existingstr = stableStringify(existing.body, { space: 2 }) ?? '';
+    const desiredstr = stableStringify(desired.body, { space: 2 }) ?? '';
 
     try {
         assert.equal(existingstr, desiredstr);

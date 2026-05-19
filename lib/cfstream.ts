@@ -53,7 +53,7 @@ export default function(stackName: string, options?: CFStreamInput) {
 
             let i;
             for (i = 0; i < (data.StackEvents || []).length; i++) {
-                const event = data.StackEvents[i];
+                const event = (data.StackEvents || [])[i];
 
                 // Assuming StackEvents are in strictly reverse chronological order,
                 // stop reading events once we reach one we've seen already.
@@ -108,11 +108,11 @@ export default function(stackName: string, options?: CFStreamInput) {
             }));
             describing = false;
 
-            if (!data.Stacks.length) return stream.emit('error', new Error('Could not describe stack: ' + stackName));
+            if (!data.Stacks?.length) return stream.emit('error', new Error('Could not describe stack: ' + stackName));
 
-            stackId = data.Stacks[0].StackId;
+            stackId = data.Stacks[0].StackId ?? stackId;
 
-            if (/COMPLETE$/.test(data.Stacks[0].StackStatus)) {
+            if (/COMPLETE$/.test(data.Stacks[0].StackStatus ?? '')) {
                 complete = true;
                 describeEvents();
             } else {

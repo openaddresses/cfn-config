@@ -26,12 +26,9 @@ test('[commands.create] no overrides', async () => {
 
     try {
         const context = await cmd.create('testing', 'templatePath');
+        assert.ok(context);
 
         assert.equal(context.operations.length, 11, '11 operations are run');
-        assert.deepEqual(context.config, opts, 'instantiate context with expected config');
-        assert.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
-        assert.equal(context.template, 'templatePath', 'set context.template');
-        assert.deepEqual(context.tags, [{ Key: 'developer', Value: 'ingalls' }], 'set context.tags');
     } catch (err) {
         assert.ifError(err);
     }
@@ -46,6 +43,7 @@ test('[commands.create] with overrides', async () => {
 
     try {
         const context = await cmd.create('testing', 'templatePath', { parameters: new Map() });
+        assert.ok(context);
 
         assert.equal(context.operations.length, 11, '11 operations are run');
         assert.deepEqual(context.config, opts, 'instantiate context with expected config');
@@ -67,6 +65,7 @@ test('[commands.create] with template object', async () => {
 
     try {
         const context = await cmd.create('testing', { arbitrary: 'template' });
+        assert.ok(context);
 
         assert.equal(context.operations.length, 11, '11 operations are run');
         assert.deepEqual(context.config, opts, 'instantiate context with expected config');
@@ -87,6 +86,7 @@ test('[commands.update] no overrides', async () => {
 
     try {
         const context = await cmd.update('testing', 'templatePath');
+        assert.ok(context);
 
         assert.equal(context.operations.length, 11, '11 operations are run');
         assert.deepEqual(context.config, opts, 'instantiate context with expected config');
@@ -108,6 +108,7 @@ test('[commands.update] with overrides', async () => {
 
     try {
         const context = await cmd.update('testing', 'templatePath', { parameters: new Map() });
+        assert.ok(context);
 
         assert.deepEqual(context.config, opts, 'instantiate context with expected config');
         assert.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
@@ -128,12 +129,35 @@ test('[commands.update] with template object', async () => {
 
     try {
         const context = await cmd.update('testing', { arbitrary: 'template' });
+        assert.ok(context);
 
         assert.equal(context.operations.length, 11, '11 operations are run');
         assert.deepEqual(context.config, opts, 'instantiate context with expected config');
         assert.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
         assert.deepEqual(context.template, { arbitrary: 'template' }, 'set context.template');
         assert.deepEqual(context.overrides, { parameters: new Map() }, 'sets empty context.overrides');
+        assert.deepEqual(context.tags, [{ Key: 'developer', Value: 'ingalls' }], 'set context.tags');
+    } catch (err) {
+        assert.ifError(err);
+    }
+
+});
+
+test('[commands.update] with driftAware override', async () => {
+    const cmd = new Commands({
+        region: 'us-east-1',
+        credentials: { accessKeyId: '-', secretAccessKey: '-' }
+    }, opts, true);
+
+    try {
+        const context = await cmd.update('testing', 'templatePath', { driftAware: true });
+        assert.ok(context);
+
+        assert.equal(context.operations.length, 11, '11 operations are run');
+        assert.deepEqual(context.config, opts, 'instantiate context with expected config');
+        assert.deepEqual(context.suffix, 'testing', 'instantiate context with expected suffix');
+        assert.equal(context.template, 'templatePath', 'set context.template');
+        assert.equal(context.driftAware, true, 'sets context.driftAware to true');
         assert.deepEqual(context.tags, [{ Key: 'developer', Value: 'ingalls' }], 'set context.tags');
     } catch (err) {
         assert.ifError(err);
@@ -149,6 +173,7 @@ test('[commands.delete] no overrides', async () => {
 
     try {
         const context = await cmd.delete('testing');
+        assert.ok(context);
 
         assert.equal(context.operations.length, 3, '3 operations are run');
         assert.deepEqual(context.config, opts, 'instantiate context with expected config');
@@ -169,6 +194,7 @@ test('[commands.cancel] no overrides', async () => {
 
     try {
         const context = await cmd.cancel('testing');
+        assert.ok(context);
 
         assert.equal(context.operations.length, 2, '2 operations are run');
         assert.deepEqual(context.config, opts, 'instantiate context with expected config');
@@ -181,19 +207,19 @@ test('[commands.cancel] no overrides', async () => {
 });
 
 test('[commands.info] success w/o resources', async () => {
-    Sinon.stub(Lookup.prototype, 'info').callsFake((name: string, resources: boolean) => {
+    Sinon.stub(Lookup.prototype, 'info').callsFake((name: string, resources?: boolean) => {
         assert.equal(name, 'my-stack-testing', 'lookup.info expected stack name');
         assert.ok(!(resources), 'lookup.info no resources');
 
         return Promise.resolve({
             StackName: name,
-            Parameters: new Map(),
+            Parameters: new Map<string, string>(),
             StackStatus: 'CREATED',
             CreationTime: new Date(),
             Capabilities: [''],
-            Outputs: new Map(),
+            Outputs: new Map<string, string>(),
             Region: 'us-east-1',
-            Tags: new Map(),
+            Tags: new Map<string, string>(),
         });
     });
 

@@ -6,17 +6,20 @@ import { randomUUID } from 'crypto';
 import s3urls from '@openaddresses/s3urls';
 import eventStream from './cfstream.js';
 import Lookup from './lookup.js';
-import {
+import type {
     Tag,
     Change,
     Parameter,
+    CreateChangeSetCommandInput,
+    DescribeChangeSetCommandOutput,
+} from '@aws-sdk/client-cloudformation';
+import {
     Capability,
     ChangeSetType,
+    DeploymentMode,
     CloudFormationClient,
     CreateChangeSetCommand,
-    CreateChangeSetCommandInput,
     DescribeChangeSetCommand,
-    DescribeChangeSetCommandOutput,
     ValidateTemplateCommand,
     DeleteStackCommand,
     ExecuteChangeSetCommand,
@@ -96,9 +99,9 @@ export default class Actions {
      * @param Tags - Tags to be applied to all resources in the stack
      * @param expand - Set CAPABILITY_AUTO_EXPAND
      */
-    async diff(name: string, desc: string, changeSetType: ChangeSetType, templateUrl: string, parameters: Parameter[], tags: Tag[], expand = false): Promise<ChangeSetDetail> {
+    async diff(name: string, desc: string, changeSetType: ChangeSetType, templateUrl: string, parameters: Parameter[], tags: Tag[], expand = false, driftAware = false): Promise<ChangeSetDetail> {
         const cfn = new CloudFormationClient(this.client);
-        const changeSetParameters = changeSet(name, desc, changeSetType, templateUrl, parameters, expand, tags);
+        const changeSetParameters = changeSet(name, desc, changeSetType, templateUrl, parameters, expand, tags, driftAware);
 
         try {
             await cfn.send(new CreateChangeSetCommand(changeSetParameters));
@@ -107,23 +110,24 @@ export default class Actions {
         }
 
         try {
-            const data = await describeChangeset(cfn, name, changeSetParameters.ChangeSetName);
+            const data = await describeChangeset(cfn, name, changeSetParameters.ChangeSetName!);
 
             const details: ChangeSetDetail = {
-                id: data.ChangeSetName,
-                status: data.Status,
-                execution: data.ExecutionStatus,
+                id: data.ChangeSetName ?? '',
+                status: data.Status ?? '',
+                execution: data.ExecutionStatus ?? '',
                 changes: []
             };
 
             if (data.Changes) {
                 details.changes = data.Changes.map((change: Change) => {
+                    const rc = change.ResourceChange;
                     return {
-                        id: change.ResourceChange.PhysicalResourceId,
-                        name: change.ResourceChange.LogicalResourceId,
-                        type: change.ResourceChange.ResourceType,
-                        action: change.ResourceChange.Action,
-                        replacement: change.ResourceChange.Replacement === 'True'
+                        id: rc?.PhysicalResourceId ?? '',
+                        name: rc?.LogicalResourceId ?? '',
+                        type: rc?.ResourceType ?? '',
+                        action: rc?.Action ?? '',
+                        replacement: rc?.Replacement === 'True'
                     };
                 });
             }
@@ -197,12 +201,13 @@ export default class Actions {
     monitor(StackName: string) {
         return new Promise((resolve, reject) => {
             const events = eventStream(StackName, { ...this.client })
-                .on('error', (err) => {
+                .on('error', (err: Error) => {
                     return reject(new Actions.CloudFormationError(err.message));
                 });
 
             const stringify = new stream.Transform({ objectMode: true });
-            stringify._transform = (event, enc, cb) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            stringify._transform = (event: any, enc: BufferEncoding, cb: stream.TransformCallback) => {
                 let msg = event.ResourceStatus[colors.get(event.ResourceStatus)] + ' ' + event.LogicalResourceId;
                 if (event.ResourceStatusReason) msg += ': ' + event.ResourceStatusReason;
                 cb(null, currentTime() + ' ' + this.client.region + ': ' + msg + '\n');
@@ -292,8 +297,8 @@ export default class Actions {
     async saveTemplate(templateUrl: string, templateBody: string) {
         const uri = url.parse(templateUrl);
 
-        const regionMatch = uri.host.match(/\.s3\.(dualstack\.)?(.*?)\.amazonaws\.com/);
-        const region = regionMatch ? regionMatch[0] : 'us-east-1';
+        const regionMatch = (uri.host ?? '').match(/\.s3\.(dualstack\.)?(.*?)\.amazonaws\.com/);
+        const region = regionMatch ? regionMatch[2] : 'us-east-1';
 
         // If the template is too large, remove excess whitespace/indentation
         if (templateBody.length > 460800) {
@@ -403,7 +408,8 @@ function changeSet(
     TemplateURL: string,
     Parameters: Parameter[],
     expand: boolean,
-    Tags: Tag[] = []
+    Tags: Tag[] = [],
+    driftAware = false
 ): CreateChangeSetCommandInput {
     const ChangeSetName = 'a' + crypto.randomBytes(16).toString('hex');
 
@@ -421,7 +427,8 @@ function changeSet(
         Tags
     };
 
-    if (expand) base.Capabilities.push(Capability.CAPABILITY_AUTO_EXPAND);
+    if (expand) base.Capabilities!.push(Capability.CAPABILITY_AUTO_EXPAND);
+    if (driftAware && ChangeSetType === 'UPDATE') base.DeploymentMode = DeploymentMode.REVERT_DRIFT;
 
     return base;
 }

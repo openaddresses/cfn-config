@@ -13,7 +13,7 @@ export default class Prompt {
         const lines = message.split('\n');
 
         if (lines.length > 1) {
-            message = lines.pop();
+            message = lines.pop()!;
             lines.unshift('');
             lines.push('');
             process.stdout.write(lines.join('\n'));
@@ -56,7 +56,7 @@ export default class Prompt {
             type: 'list',
             name: 'config',
             message: 'Saved configurations',
-            choices: [].concat(configs, ['New configuration'])
+            choices: ([] as string[]).concat(configs, ['New configuration'])
         });
 
         return answers.config;

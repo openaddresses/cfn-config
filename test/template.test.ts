@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import TemplateReader, { Template } from '../lib/template.js';
-import fs from 'fs';
+import fs from 'node:fs';
 import Sinon from 'sinon';
 import S3 from '@aws-sdk/client-s3';
 

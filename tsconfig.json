@@ -1,24 +1,25 @@
 {
     "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "useUnknownInCatchVariables": false,
+        "declaration": true,
         "module": "es2022",
         "esModuleInterop": true,
         "target": "es2022",
-        "declaration": true,
-        "declarationMap": true,
+        "lib": ["es2022", "dom"],
+        "types": ["node"],
+        "skipLibCheck": true,
         "noImplicitAny": true,
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
+        "resolveJsonModule": true,
+        "verbatimModuleSyntax": true,
         "sourceMap": true,
-        "rootDir": ".",
-        "outDir": "./dist",
-        "baseUrl": ".",
-        "paths": {
-            "*": [
-                "node_modules/*"
-            ]
-        }
+        "outDir": "dist"
     },
     "include": [
         "index.ts",
-        "lib/**/*.ts"
+        "test/*.ts",
+        "lib/*.ts"
     ]
 }

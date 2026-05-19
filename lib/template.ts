@@ -139,7 +139,7 @@ export default class TemplateReader {
 
             let templateBody;
             try {
-                templateBody = JSON.parse(data.Body.toString());
+                templateBody = JSON.parse(data.Body!.toString());
             } catch (err) {
                 throw new TemplateReader.InvalidTemplateError(`Failed to parse ${templatePath}: ${err.message}`);
             }
@@ -154,8 +154,8 @@ export default class TemplateReader {
      * @param {object} templateBody - a parsed CloudFormation template
      */
     questions(template: Template, defaults: Map<string, string> = new Map()): TemplateQuestion[] {
-        return Object.keys(template.body.Parameters).map((name: string) => {
-            const parameter = template.body.Parameters[name];
+        return Object.keys(template.body.Parameters || {}).map((name: string) => {
+            const parameter = (template.body.Parameters || {})[name];
 
             const question: TemplateQuestion = {
                 name,
@@ -188,7 +188,7 @@ export default class TemplateReader {
             })();
 
             if (defaults.has(name)) {
-                if (!question.choices || question.choices.indexOf(defaults.get(name)) !== -1) {
+                if (!question.choices || question.choices.indexOf(defaults.get(name)!) !== -1) {
                     question.default = defaults.get(name);
                 }
             }

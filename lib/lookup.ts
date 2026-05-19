@@ -1,9 +1,11 @@
-import {
+import type {
     StackDriftInformation,
     RollbackConfiguration,
+    StackResourceSummary
+} from '@aws-sdk/client-cloudformation';
+import {
     CloudFormationClient,
     DescribeStacksCommand,
-    StackResourceSummary,
     ListStackResourcesCommand,
     GetTemplateCommand
 } from '@aws-sdk/client-cloudformation';
@@ -93,22 +95,25 @@ export default class Lookup {
             }
         }
 
-        if (!data.Stacks.length) throw new Lookup.StackNotFoundError(`Stack ${StackName} not found in ${this.client.region}`);
+        if (!data.Stacks?.length) throw new Lookup.StackNotFoundError(`Stack ${StackName} not found in ${this.client.region}`);
 
         const stackInfo: InfoOutput = {
             ...data.Stacks[0],
+            StackName: data.Stacks[0].StackName ?? '',
+            StackStatus: data.Stacks[0].StackStatus ?? '',
+            CreationTime: data.Stacks[0].CreationTime ?? new Date(),
             Region: this.client.region,
             Capabilities: data.Stacks[0].Capabilities || [],
             Parameters: (data.Stacks[0].Parameters || []).reduce((memo, param) => {
-                memo.set(param.ParameterKey, param.ParameterValue);
+                memo.set(param.ParameterKey ?? '', param.ParameterValue);
                 return memo;
             }, new Map()),
             Outputs: (data.Stacks[0].Outputs || []).reduce((memo, output) => {
-                memo.set(output.OutputKey, output.OutputValue);
+                memo.set(output.OutputKey ?? '', output.OutputValue);
                 return memo;
             }, new Map()),
             Tags: (data.Stacks[0].Tags || []).reduce((memo, output) => {
-                memo.set(output.Key, output.Value);
+                memo.set(output.Key ?? '', output.Value);
                 return memo;
             }, new Map())
         };
@@ -121,11 +126,11 @@ export default class Lookup {
         try {
             let page = await cfn.send(new ListStackResourcesCommand({ StackName }));
 
-            StackResourceSummaries = StackResourceSummaries.concat(page.StackResourceSummaries);
+            StackResourceSummaries = StackResourceSummaries.concat(page.StackResourceSummaries || []);
 
             while (page.NextToken) {
                 page = await cfn.send(new ListStackResourcesCommand({ StackName, NextToken: page.NextToken }));
-                StackResourceSummaries = StackResourceSummaries.concat(page.StackResourceSummaries);
+                StackResourceSummaries = StackResourceSummaries.concat(page.StackResourceSummaries || []);
             }
 
             stackInfo.StackResources = StackResourceSummaries;
@@ -161,7 +166,7 @@ export default class Lookup {
 
         try {
             // If this fails the above API probably returned YAML, ask for the processed result
-            return new Template(JSON.parse(data.TemplateBody));
+            return new Template(JSON.parse(data.TemplateBody ?? ''));
         } catch {
             try {
                 data = await cfn.send(new GetTemplateCommand({
@@ -169,7 +174,7 @@ export default class Lookup {
                     TemplateStage: 'Processed'
                 }));
 
-                return new Template(JSON.parse(data.TemplateBody));
+                return new Template(JSON.parse(data.TemplateBody ?? ''));
             } catch (err) {
                 if (err.code === 'ValidationError' && /Stack with id/.test(err.message)) {
                     throw new Lookup.StackNotFoundError(`Stack ${StackName} not found in ${this.client.region}`);
@@ -200,9 +205,9 @@ export default class Lookup {
             if (!data.Contents) return [];
 
             return data.Contents.filter((obj) => {
-                return obj.Key.split('.').slice(-2).join('.') === 'cfn.json' && obj.Size > 0;
+                return (obj.Key ?? '').split('.').slice(-2).join('.') === 'cfn.json' && (obj.Size ?? 0) > 0;
             }).map((obj) => {
-                return path.basename(obj.Key, '.cfn.json');
+                return path.basename(obj.Key ?? '', '.cfn.json');
             });
         } catch (err) {
             if (err.code === 'NoSuchBucket') {
@@ -268,7 +273,7 @@ export default class Lookup {
 
         let region;
         try {
-            region = await this.bucketRegion(params.Bucket);
+            region = await this.bucketRegion(params.Bucket!);
         } catch {
             return {};
         }
@@ -328,7 +333,7 @@ export default class Lookup {
 async function streamToString (stream: Readable): Promise<string> {
     return await new Promise((resolve, reject) => {
         const chunks: Uint8Array[] = [];
-        stream.on('data', (chunk) => chunks.push(chunk));
+        stream.on('data', (chunk: Uint8Array) => chunks.push(chunk));
         stream.on('error', reject);
         stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')));
     });

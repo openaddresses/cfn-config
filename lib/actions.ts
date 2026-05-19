@@ -6,18 +6,20 @@ import { randomUUID } from 'crypto';
 import s3urls from '@openaddresses/s3urls';
 import eventStream from './cfstream.js';
 import Lookup from './lookup.js';
-import {
+import type {
     Tag,
     Change,
     Parameter,
+    CreateChangeSetCommandInput,
+    DescribeChangeSetCommandOutput,
+} from '@aws-sdk/client-cloudformation';
+import {
     Capability,
     ChangeSetType,
     DeploymentMode,
     CloudFormationClient,
     CreateChangeSetCommand,
-    CreateChangeSetCommandInput,
     DescribeChangeSetCommand,
-    DescribeChangeSetCommandOutput,
     ValidateTemplateCommand,
     DeleteStackCommand,
     ExecuteChangeSetCommand,
@@ -108,23 +110,24 @@ export default class Actions {
         }
 
         try {
-            const data = await describeChangeset(cfn, name, changeSetParameters.ChangeSetName);
+            const data = await describeChangeset(cfn, name, changeSetParameters.ChangeSetName!);
 
             const details: ChangeSetDetail = {
-                id: data.ChangeSetName,
-                status: data.Status,
-                execution: data.ExecutionStatus,
+                id: data.ChangeSetName ?? '',
+                status: data.Status ?? '',
+                execution: data.ExecutionStatus ?? '',
                 changes: []
             };
 
             if (data.Changes) {
                 details.changes = data.Changes.map((change: Change) => {
+                    const rc = change.ResourceChange;
                     return {
-                        id: change.ResourceChange.PhysicalResourceId,
-                        name: change.ResourceChange.LogicalResourceId,
-                        type: change.ResourceChange.ResourceType,
-                        action: change.ResourceChange.Action,
-                        replacement: change.ResourceChange.Replacement === 'True'
+                        id: rc?.PhysicalResourceId ?? '',
+                        name: rc?.LogicalResourceId ?? '',
+                        type: rc?.ResourceType ?? '',
+                        action: rc?.Action ?? '',
+                        replacement: rc?.Replacement === 'True'
                     };
                 });
             }
@@ -198,12 +201,13 @@ export default class Actions {
     monitor(StackName: string) {
         return new Promise((resolve, reject) => {
             const events = eventStream(StackName, { ...this.client })
-                .on('error', (err) => {
+                .on('error', (err: Error) => {
                     return reject(new Actions.CloudFormationError(err.message));
                 });
 
             const stringify = new stream.Transform({ objectMode: true });
-            stringify._transform = (event, enc, cb) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            stringify._transform = (event: any, enc: BufferEncoding, cb: stream.TransformCallback) => {
                 let msg = event.ResourceStatus[colors.get(event.ResourceStatus)] + ' ' + event.LogicalResourceId;
                 if (event.ResourceStatusReason) msg += ': ' + event.ResourceStatusReason;
                 cb(null, currentTime() + ' ' + this.client.region + ': ' + msg + '\n');
@@ -293,7 +297,7 @@ export default class Actions {
     async saveTemplate(templateUrl: string, templateBody: string) {
         const uri = url.parse(templateUrl);
 
-        const regionMatch = uri.host.match(/\.s3\.(dualstack\.)?(.*?)\.amazonaws\.com/);
+        const regionMatch = (uri.host ?? '').match(/\.s3\.(dualstack\.)?(.*?)\.amazonaws\.com/);
         const region = regionMatch ? regionMatch[0] : 'us-east-1';
 
         // If the template is too large, remove excess whitespace/indentation
@@ -423,7 +427,7 @@ function changeSet(
         Tags
     };
 
-    if (expand) base.Capabilities.push(Capability.CAPABILITY_AUTO_EXPAND);
+    if (expand) base.Capabilities!.push(Capability.CAPABILITY_AUTO_EXPAND);
     if (driftAware) base.DeploymentMode = DeploymentMode.REVERT_DRIFT;
 
     return base;

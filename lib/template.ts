@@ -28,6 +28,7 @@ interface TemplateQuestion {
     message: string;
     type: 'password' | 'list' | 'input';
     validate: (input: string) => boolean;
+    filter?: (input: string) => string;
 }
 
 export interface CloudFormationTemplate {
@@ -191,6 +192,12 @@ export default class TemplateReader {
                 if (!question.choices || question.choices.indexOf(defaults.get(name)!) !== -1) {
                     question.default = defaults.get(name);
                 }
+            }
+
+            if (parameter.NoEcho && defaults.has(name)) {
+                const existing = defaults.get(name)!;
+                question.message = question.message.replace(/:$/, ' [****]:');
+                question.filter = (input: string) => input === '' ? existing : input;
             }
 
             return question;

@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file. For change log formatting, see http://keepachangelog.com/
 
+## 8.2.0 - 2026-06-06
+
+- :rocket: Improved NoEcho support
+
 ## 8.1.0 - 2026-05-19
 
 - :rocket: Update to Typescript@6

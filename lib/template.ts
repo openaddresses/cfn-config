@@ -26,7 +26,7 @@ interface TemplateQuestion {
     choices?: string[];
     default?: string;
     message: string;
-    type: 'password' | 'list' | 'input';
+    type: 'password' | 'select' | 'input';
     validate: (input: string) => boolean;
     filter?: (input: string) => string;
 }
@@ -184,7 +184,7 @@ export default class TemplateReader {
 
             question.type = (() => {
                 if (parameter.NoEcho) return 'password';
-                if (parameter.AllowedValues) return 'list';
+                if (parameter.AllowedValues) return 'select';
                 return 'input';
             })();
 

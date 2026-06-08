@@ -53,7 +53,7 @@ export default class Prompt {
      */
     static async configuration(configs: string[]): Promise<string> {
         const answers = await inquirer.prompt({
-            type: 'list',
+            type: 'select',
             name: 'config',
             message: 'Saved configurations',
             choices: ([] as string[]).concat(configs, ['New configuration'])

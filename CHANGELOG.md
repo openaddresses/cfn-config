@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file. For change log formatting, see http://keepachangelog.com/
 
+## 8.2.1 - 2026-06-08
+
+- :bug: `list` => `select` type in inquirer prompts to support multi-select parameters
+
 ## 8.2.0 - 2026-06-06
 
 - :rocket: Improved NoEcho support

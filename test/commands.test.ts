@@ -165,6 +165,40 @@ test('[commands.update] with driftAware override', async () => {
 
 });
 
+test('[commands.update] with roleArn config', async () => {
+    const roleArn = 'arn:aws:iam::123456789012:role/cloudformation';
+
+    const cmd = new Commands({
+        region: 'us-east-1',
+        credentials: { accessKeyId: '-', secretAccessKey: '-' }
+    }, { ...opts, roleArn }, true);
+
+    try {
+        const context = await cmd.update('testing', 'templatePath');
+        assert.ok(context);
+
+        assert.equal(context.roleArn, roleArn, 'sets context.roleArn from config');
+    } catch (err) {
+        assert.ifError(err);
+    }
+});
+
+test('[commands.update] without roleArn config', async () => {
+    const cmd = new Commands({
+        region: 'us-east-1',
+        credentials: { accessKeyId: '-', secretAccessKey: '-' }
+    }, opts, true);
+
+    try {
+        const context = await cmd.update('testing', 'templatePath');
+        assert.ok(context);
+
+        assert.equal(context.roleArn, undefined, 'context.roleArn is undefined');
+    } catch (err) {
+        assert.ifError(err);
+    }
+});
+
 test('[commands.delete] no overrides', async () => {
     const cmd = new Commands({
         region: 'us-east-1',

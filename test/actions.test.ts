@@ -448,6 +448,78 @@ test('[actions.diff] success', async () => {
     Sinon.restore();
 });
 
+test('[actions.diff] roleArn sets RoleARN on changeset', async () => {
+    const url = 'https://my-bucket.s3.amazonaws.com/my-template.json';
+    const roleArn = 'arn:aws:iam::123456789012:role/cloudformation';
+    let capturedInput: CreateChangeSetCommandInput;
+
+    Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
+        if (command instanceof CreateChangeSetCommand) {
+            capturedInput = command.input;
+            return Promise.resolve({ Id: 'changeset:arn' });
+        } else if (command instanceof DescribeChangeSetCommand) {
+            return Promise.resolve({
+                ChangeSetName: command.input.ChangeSetName,
+                ExecutionStatus: 'AVAILABLE',
+                Status: 'CREATE_COMPLETE',
+                Changes: []
+            });
+        }
+    });
+
+    const actions = new Actions({
+        region: 'us-east-1',
+        credentials: {
+            accessKeyId: '123',
+            secretAccessKey: '321'
+        }
+    });
+
+    try {
+        await actions.diff('my-stack', 'Stack Description', 'UPDATE', url, [], [], false, false, roleArn);
+        assert.equal(capturedInput!.RoleARN, roleArn, 'RoleARN is set on changeset');
+
+        await actions.diff('my-stack', 'Stack Description', 'UPDATE', url, [], []);
+        assert.equal(capturedInput!.RoleARN, undefined, 'RoleARN is omitted when no roleArn given');
+    } catch (err) {
+        assert.ifError(err);
+    }
+
+    Sinon.restore();
+});
+
+test('[actions.delete] roleArn sets RoleARN', async () => {
+    const roleArn = 'arn:aws:iam::123456789012:role/cloudformation';
+    let capturedInput: { StackName?: string; RoleARN?: string };
+
+    Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
+        if (command instanceof DeleteStackCommand) {
+            capturedInput = command.input;
+            return Promise.resolve({});
+        }
+    });
+
+    const actions = new Actions({
+        region: 'us-east-1',
+        credentials: {
+            accessKeyId: '123',
+            secretAccessKey: '321'
+        }
+    });
+
+    try {
+        await actions.delete('my-stack', roleArn);
+        assert.equal(capturedInput!.RoleARN, roleArn, 'RoleARN is set on delete');
+
+        await actions.delete('my-stack');
+        assert.equal(capturedInput!.RoleARN, undefined, 'RoleARN is omitted when no roleArn given');
+    } catch (err) {
+        assert.ifError(err);
+    }
+
+    Sinon.restore();
+});
+
 test('[actions.diff] drift-aware changeset sets DeploymentMode', async () => {
     const url = 'https://my-bucket.s3.amazonaws.com/my-template.json';
     let capturedInput: CreateChangeSetCommandInput;

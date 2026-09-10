@@ -72,7 +72,8 @@ const options = {
     tags: [{ // Tags applied to all sub-resources within a stack
         Key: 'developer',
         Value: 'ingalls'
-    }]
+    }],
+    roleArn: 'arn:aws:iam::123456789012:role/cloudformation' // optional Service Role CloudFormation assumes for create/update/delete
 };
 
 const commands = new Commands(client, options);

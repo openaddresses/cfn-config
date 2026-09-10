@@ -263,7 +263,7 @@ test('[template.questions] provides expected questions without encryption', asyn
     assert.ok(!(age.validate('-180')), 'invalid success for Age');
 
     const handedness = questions[2];
-    assert.equal(handedness.type, 'list', 'correct type for Handedness');
+    assert.equal(handedness.type, 'select', 'correct type for Handedness');
     assert.equal(handedness.name, 'Handedness', 'correct name for Handedness');
     assert.equal(handedness.message, 'Handedness. Their dominant hand:', 'correct message for Handedness');
     assert.equal(handedness.default, 'right', 'correct default value for Handedness');

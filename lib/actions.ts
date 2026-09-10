@@ -98,10 +98,12 @@ export default class Actions {
      * @param parameters - parameters for the ChangeSet
      * @param Tags - Tags to be applied to all resources in the stack
      * @param expand - Set CAPABILITY_AUTO_EXPAND
+     * @param driftAware - Set DeploymentMode REVERT_DRIFT on updates
+     * @param roleArn - IAM Service Role CloudFormation assumes to perform the operation
      */
-    async diff(name: string, desc: string, changeSetType: ChangeSetType, templateUrl: string, parameters: Parameter[], tags: Tag[], expand = false, driftAware = false): Promise<ChangeSetDetail> {
+    async diff(name: string, desc: string, changeSetType: ChangeSetType, templateUrl: string, parameters: Parameter[], tags: Tag[], expand = false, driftAware = false, roleArn?: string): Promise<ChangeSetDetail> {
         const cfn = new CloudFormationClient(this.client);
-        const changeSetParameters = changeSet(name, desc, changeSetType, templateUrl, parameters, expand, tags, driftAware);
+        const changeSetParameters = changeSet(name, desc, changeSetType, templateUrl, parameters, expand, tags, driftAware, roleArn);
 
         try {
             await cfn.send(new CreateChangeSetCommand(changeSetParameters));
@@ -178,13 +180,15 @@ export default class Actions {
      * Delete an existing CloudFormation stack
      *
      * @param name - the name of the existing stack to update
+     * @param roleArn - IAM Service Role CloudFormation assumes to perform the operation
      */
-    async delete(name: string) {
+    async delete(name: string, roleArn?: string) {
         const cfn = new CloudFormationClient(this.client);
 
         try {
             await cfn.send(new DeleteStackCommand({
-                StackName: name
+                StackName: name,
+                ...(roleArn ? { RoleARN: roleArn } : {})
             }));
         } catch (err) {
             throw new Actions.CloudFormationError(err.message);
@@ -409,7 +413,8 @@ function changeSet(
     Parameters: Parameter[],
     expand: boolean,
     Tags: Tag[] = [],
-    driftAware = false
+    driftAware = false,
+    roleArn?: string
 ): CreateChangeSetCommandInput {
     const ChangeSetName = 'a' + crypto.randomBytes(16).toString('hex');
 
@@ -429,6 +434,7 @@ function changeSet(
 
     if (expand) base.Capabilities!.push(Capability.CAPABILITY_AUTO_EXPAND);
     if (driftAware && ChangeSetType === 'UPDATE') base.DeploymentMode = DeploymentMode.REVERT_DRIFT;
+    if (roleArn) base.RoleARN = roleArn;
 
     return base;
 }

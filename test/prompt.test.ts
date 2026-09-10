@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import assert from 'node:assert/strict';
-import test from 'node:test';
+import test, { afterEach } from 'node:test';
 import Sinon from 'sinon';
 import inquirer from 'inquirer';
 import prompt from '../lib/prompt.js';
 
+afterEach(() => Sinon.restore());
 
 test('[prompt.confirm] single-line, confirm', async () => {
     Sinon.stub(inquirer, 'prompt').callsFake((questions: any) =>  {
@@ -75,7 +76,7 @@ test('[prompt.confirm] multi-line, reject', async () => {
 test('[prompt.configuration] success', async () => {
     Sinon.stub(inquirer, 'prompt').callsFake((questions: any) =>  {
         assert.deepEqual(questions, {
-            type: 'list',
+            type: 'select',
             name: 'config',
             message: 'Saved configurations',
             choices: ['a', 'b', 'New configuration']

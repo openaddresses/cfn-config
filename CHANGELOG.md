@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file. For change log formatting, see http://keepachangelog.com/
 
+## 8.3.0 - 2026-09-10
+
+- :tada: Add `roleArn` option to pass a CloudFormation Service Role on create, update, and delete
+
 ## 8.2.3 - 2026-06-08
 
 - :bug: Additional `list` => `select` types

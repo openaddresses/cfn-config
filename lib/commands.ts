@@ -26,6 +26,7 @@ export interface CommandOptions {
     base?: string;
     name?: string;
     tags?: Tag[];
+    roleArn?: string;
     configBucket?: string;
     templateBucket?: string;
 }
@@ -254,6 +255,7 @@ class CommandContext {
     configName?: string;
     create?: boolean;
     tags: Tag[];
+    roleArn?: string;
     operations: ((context: CommandContext) => Promise<void>)[];
 
     template?: string | object;
@@ -275,6 +277,7 @@ class CommandContext {
         this.templateBucket = config.templateBucket!;
         this.diffs = {};
         this.tags = config.tags || [];
+        this.roleArn = config.roleArn;
 
         this.oldTemplate = new Template();
         this.newTemplate = new Template();
@@ -462,7 +465,8 @@ class Operations {
                 context.changesetParameters!,
                 context.tags,
                 false,
-                context.driftAware
+                context.driftAware,
+                context.roleArn
             );
 
             context.changeset = details;
@@ -575,7 +579,7 @@ class Operations {
     static async deleteStack(context: CommandContext) {
         const actions = new Actions(context.client);
         try {
-            await actions.delete(context.stackName);
+            await actions.delete(context.stackName, context.roleArn);
         } catch (err) {
             let msg = 'Failed to delete stack: '; // err instanceof Actions.CloudFormationError
             msg += err.message;

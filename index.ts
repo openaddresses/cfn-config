@@ -12,7 +12,7 @@ import type {
 } from '@aws-sdk/types';
 
 export { Actions };
-export type { ChangeSetDetail, ChangeSetDetailChange } from './lib/actions.js';
+export type { ChangeSetDetail, ChangeSetDetailChange, ChangeSetFailure } from './lib/actions.js';
 export { Commands };
 export type { CommandOptions, CommandOverrides } from './lib/commands.js';
 export { Lookup };

@@ -9,7 +9,7 @@ import stableStringify from 'json-stable-stringify';
 import { diffLines } from 'diff';
 import Table from 'easy-table';
 import Actions from './actions.js';
-import type { ChangeSetDetail, ChangeSetDetailChange } from './actions.js';
+import type { ChangeSetDetail, ChangeSetDetailChange, ChangeSetFailure } from './actions.js';
 import Lookup from './lookup.js';
 import Prompt from './prompt.js';
 import TemplateReader from './template.js';
@@ -469,6 +469,10 @@ class Operations {
                 context.roleArn
             );
 
+            if (details.status === 'FAILED') {
+                throw new Actions.CloudFormationError(formatFailures(details));
+            }
+
             context.changeset = details;
         } catch (err) {
             let msg = 'Failed to generate changeset: '; // err instanceof Actions.CloudFormationError
@@ -704,6 +708,27 @@ function compareTemplate(existing: Template, desired: Template) {
 
         return diffText;
     }
+}
+
+function formatFailures(details: ChangeSetDetail): string {
+    const lines = [details.reason ?? 'Changeset status FAILED'];
+
+    if (details.failures && details.failures.length) {
+        const t = new Table();
+
+        details.failures.forEach((failure: ChangeSetFailure) => {
+            t.cell('Check', failure.check.red);
+            t.cell('Name', failure.name);
+            t.cell('Type', failure.type);
+            t.cell('Path', failure.path ?? '');
+            t.cell('Reason', failure.reason);
+            t.newRow();
+        });
+
+        lines.push('', t.toString());
+    }
+
+    return lines.join('\n');
 }
 
 function formatDiff(details: ChangeSetDetail): string {

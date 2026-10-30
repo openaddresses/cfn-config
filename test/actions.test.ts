@@ -10,6 +10,7 @@ import {
     DeleteStackCommand,
     ValidateTemplateCommand,
     ExecuteChangeSetCommand,
+    DescribeEventsCommand,
     DescribeStackEventsCommand
 } from '@aws-sdk/client-cloudformation';
 import type { CreateChangeSetCommandInput } from '@aws-sdk/client-cloudformation';
@@ -256,7 +257,43 @@ test('[actions.diff] changeset failed to create', async () => {
                 StackId: 'arn:aws:cloudformation:us-east-1:123456789012:stack/my-stack/be3aa370-5b64-11e6-a232-500c217dbe62',
                 StackName: 'my-stack',
                 ExecutionStatus: 'UNAVAILABLE',
-                Status: 'FAILED'
+                Status: 'FAILED',
+                StatusReason: 'The following hook(s)/validation failed: [AWS::EarlyValidation::ResourceExistenceCheck]. To troubleshoot Early Validation errors, use the DescribeEvents API for detailed failure information.'
+            });
+        } else if (command instanceof DescribeEventsCommand) {
+            assert.equal(command.input.StackName, 'my-stack', 'describe events for correct stack');
+            assert.ok(/^a[0-9a-f]{32}$/.test(command.input.ChangeSetName!), 'describe events for the created changeset');
+            assert.deepEqual(command.input.Filters, { FailedEvents: true }, 'only failed events requested');
+
+            if (!command.input.NextToken) {
+                return Promise.resolve({
+                    OperationEvents: [{
+                        EventType: 'PROGRESS_EVENT',
+                        LogicalResourceId: 'my-stack',
+                        ResourceType: 'AWS::CloudFormation::Stack',
+                        ResourceStatus: 'UPDATE_FAILED'
+                    }, {
+                        EventType: 'VALIDATION_ERROR',
+                        LogicalResourceId: 'Bucket',
+                        ResourceType: 'AWS::S3::Bucket',
+                        ValidationName: 'AWS::EarlyValidation::ResourceExistenceCheck',
+                        ValidationStatus: 'FAILED',
+                        ValidationStatusReason: 'Resource of type AWS::S3::Bucket with identifier my-missing-bucket was not found',
+                        ValidationPath: '/Resources/Bucket/Properties/BucketName'
+                    }],
+                    NextToken: 'page-2'
+                });
+            }
+
+            return Promise.resolve({
+                OperationEvents: [{
+                    EventType: 'HOOK_INVOCATION_ERROR',
+                    LogicalResourceId: 'Role',
+                    ResourceType: 'AWS::IAM::Role',
+                    HookType: 'Org::Security::IamHook',
+                    HookStatus: 'HOOK_COMPLETE_FAILED',
+                    HookStatusReason: 'Wildcard actions are not permitted'
+                }]
             });
         } else {
             return Promise.reject(new Error('Test Error - Unexpected Command'));
@@ -278,11 +315,66 @@ test('[actions.diff] changeset failed to create', async () => {
             id: '123',
             status: 'FAILED',
             execution: 'UNAVAILABLE',
-            changes: []
+            reason: 'The following hook(s)/validation failed: [AWS::EarlyValidation::ResourceExistenceCheck]. To troubleshoot Early Validation errors, use the DescribeEvents API for detailed failure information.',
+            changes: [],
+            failures: [{
+                name: 'Bucket',
+                type: 'AWS::S3::Bucket',
+                check: 'AWS::EarlyValidation::ResourceExistenceCheck',
+                reason: 'Resource of type AWS::S3::Bucket with identifier my-missing-bucket was not found',
+                path: '/Resources/Bucket/Properties/BucketName'
+            }, {
+                name: 'Role',
+                type: 'AWS::IAM::Role',
+                check: 'Org::Security::IamHook',
+                reason: 'Wildcard actions are not permitted'
+            }]
         }, 'returned changeset details');
     } catch (err) {
         assert.ifError(err);
     }
+
+    Sinon.restore();
+});
+
+test('[actions.diff] changeset failed and DescribeEvents unavailable', async () => {
+    const url = 'https://my-bucket.s3.amazonaws.com/my-template.json';
+
+    Sinon.stub(CloudFormationClient.prototype, 'send').callsFake((command) => {
+        if (command instanceof CreateChangeSetCommand) {
+            return Promise.resolve({ Id: 'changeset:arn' });
+        } else if (command instanceof DescribeChangeSetCommand) {
+            return Promise.resolve({
+                ChangeSetName: '123',
+                ExecutionStatus: 'UNAVAILABLE',
+                Status: 'FAILED',
+                StatusReason: 'The submitted information didn\'t contain changes.'
+            });
+        } else if (command instanceof DescribeEventsCommand) {
+            return Promise.reject(new Error('User is not authorized to perform: cloudformation:DescribeEvents'));
+        } else {
+            return Promise.reject(new Error('Test Error - Unexpected Command'));
+        }
+    });
+
+    const actions = new Actions({
+        region: 'us-east-1',
+        credentials: {
+            accessKeyId: '123',
+            secretAccessKey: '321'
+        }
+    });
+
+    const data = await actions.diff('my-stack', 'Stack Description', 'UPDATE', url, [], []);
+
+    assert.deepEqual(data, {
+        id: '123',
+        status: 'FAILED',
+        execution: 'UNAVAILABLE',
+        reason: 'The submitted information didn\'t contain changes.',
+        changes: [],
+        failures: []
+    }, 'returned changeset details without failures');
 
     Sinon.restore();
 });

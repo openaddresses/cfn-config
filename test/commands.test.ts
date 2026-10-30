@@ -1607,6 +1607,42 @@ test('[Operations.getChangeset] failure', async () => {
     Actions.diff.restore();
 });
 
+test('[Operations.getChangeset] changeset failed', async () => {
+    Sinon.stub(Actions, 'diff').callsFake(() => {
+        return Promise.resolve({
+            id: '123',
+            status: 'FAILED',
+            execution: 'UNAVAILABLE',
+            reason: 'The following hook(s)/validation failed: [AWS::EarlyValidation::ResourceExistenceCheck].',
+            changes: [],
+            failures: [{
+                name: 'Bucket',
+                type: 'AWS::S3::Bucket',
+                check: 'AWS::EarlyValidation::ResourceExistenceCheck',
+                reason: 'Resource of type AWS::S3::Bucket with identifier my-missing-bucket was not found',
+                path: '/Resources/Bucket/Properties/BucketName'
+            }]
+        });
+    });
+
+    try {
+        const context = new CommandContext(opts, 'testing', []);
+
+        await Operations.getChangeset(context, 'UPDATE');
+
+        assert.fail();
+    } catch (err) {
+        assert.ok(err instanceof Actions.CloudFormationError, 'correct error type');
+        assert.ok(err.message.startsWith('Failed to generate changeset: The following hook(s)/validation failed: [AWS::EarlyValidation::ResourceExistenceCheck].\n'), 'message leads with the status reason');
+        assert.ok(err.message.includes('AWS::EarlyValidation::ResourceExistenceCheck'), 'message lists the failed check');
+        assert.ok(err.message.includes('Bucket'), 'message lists the resource');
+        assert.ok(err.message.includes('/Resources/Bucket/Properties/BucketName'), 'message lists the validation path');
+        assert.ok(err.message.includes('my-missing-bucket was not found'), 'message lists the failure reason');
+    }
+
+    Actions.diff.restore();
+});
+
 test('[Operations.getChangeset] success', async () => {
     const details = { changeset: 'details' };
 

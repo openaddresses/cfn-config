@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file. For change log formatting, see http://keepachangelog.com/
 
+## 9.0.0 - 2026-10-30
+
+- :arrow_up: Require NodeJS@26 or later
+- :rocket: Fail fast when a changeset ends in a `FAILED` state instead of prompting to execute it
+- :rocket: Surface Early Validation, Hook and provisioning failures from the `DescribeEvents` API on failed changesets
+
 ## 8.3.0 - 2026-09-10
 
 - :tada: Add `roleArn` option to pass a CloudFormation Service Role on create, update, and delete

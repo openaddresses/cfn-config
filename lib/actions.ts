@@ -10,8 +10,10 @@ import type {
     Tag,
     Change,
     Parameter,
+    OperationEvent,
     CreateChangeSetCommandInput,
     DescribeChangeSetCommandOutput,
+    DescribeEventsCommandOutput,
 } from '@aws-sdk/client-cloudformation';
 import {
     Capability,
@@ -20,6 +22,7 @@ import {
     CloudFormationClient,
     CreateChangeSetCommand,
     DescribeChangeSetCommand,
+    DescribeEventsCommand,
     ValidateTemplateCommand,
     DeleteStackCommand,
     ExecuteChangeSetCommand,
@@ -53,7 +56,17 @@ export interface ChangeSetDetail {
     id: string;
     status: string;
     execution: string;
+    reason?: string;
     changes: ChangeSetDetailChange[];
+    failures?: ChangeSetFailure[];
+}
+
+export interface ChangeSetFailure {
+    name: string;
+    type: string;
+    check: string;
+    reason: string;
+    path?: string;
 }
 
 export interface ChangeSetDetailChange {
@@ -132,6 +145,11 @@ export default class Actions {
                         replacement: rc?.Replacement === 'True'
                     };
                 });
+            }
+
+            if (data.Status === 'FAILED') {
+                details.reason = data.StatusReason;
+                details.failures = await describeFailures(cfn, name, changeSetParameters.ChangeSetName!);
             }
 
             return details;
@@ -384,6 +402,46 @@ async function describeChangeset(cfn: CloudFormationClient, name: string, change
 
     if (changes.length) changesetDescriptions.Changes = changes;
     return changesetDescriptions;
+}
+
+/**
+ * Collect failed events (Early Validation, Hook and provisioning errors)
+ * for a changeset that ended in a FAILED state.
+ *
+ * @private
+ * @param {object} cfn - a cloudformation client object
+ * @param {string} name - the name of the stack
+ * @param {string} changesetId - the name or ARN of the failed changeset
+ */
+async function describeFailures(cfn: CloudFormationClient, name: string, changesetId: string): Promise<ChangeSetFailure[]> {
+    const events: OperationEvent[] = [];
+
+    try {
+        let nextToken: string | undefined;
+        do {
+            const data: DescribeEventsCommandOutput = await cfn.send(new DescribeEventsCommand({
+                StackName: name,
+                ChangeSetName: changesetId,
+                Filters: { FailedEvents: true },
+                NextToken: nextToken
+            }));
+
+            events.push(...(data.OperationEvents ?? []));
+            nextToken = data.NextToken;
+        } while (nextToken);
+    } catch {
+        return [];
+    }
+
+    return events
+        .filter((event) => event.EventType !== 'STACK_EVENT' && event.EventType !== 'PROGRESS_EVENT')
+        .map((event) => ({
+            name: event.LogicalResourceId ?? '',
+            type: event.ResourceType ?? '',
+            check: event.ValidationName ?? event.HookType ?? event.EventType ?? '',
+            reason: event.ValidationStatusReason ?? event.HookStatusReason ?? event.ResourceStatusReason ?? '',
+            ...(event.ValidationPath ? { path: event.ValidationPath } : {})
+        }));
 }
 
 function sleep(ms: number): Promise<undefined> {

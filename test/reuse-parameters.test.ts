@@ -18,8 +18,6 @@ const opts = {
     templateBucket: 'my-template-bucket'
 };
 
-// Four parameters: two the stack knows, one the caller overrides, one new
-// to the template.
 const body = () => ({
     Parameters: {
         Name: { Type: 'String' },
@@ -30,8 +28,6 @@ const body = () => ({
     Resources: {}
 });
 
-// Prompt.parameters is typed on inquirer's question shape; the tests only
-// need the names.
 const namesOf = (questions: unknown): string[] => (questions as { name: string }[]).map((question) => question.name);
 
 const stackValues = () => new Map([
@@ -108,6 +104,35 @@ test('[Operations.promptParameters] reuseParameters re-asks a value the template
         assert.deepEqual(asked, [['Handedness', 'Added']], 'the disallowed value is asked again, the rest reused');
         assert.equal(context.newTemplate.parameters.get('Handedness'), 'left');
         assert.equal(context.newTemplate.parameters.get('GitSha'), 'old', 'no override: the stack value stands');
+    } catch (err) {
+        assert.ifError(err);
+    }
+
+});
+
+test('[Operations.promptParameters] reuseParameters re-asks a value that fails the template constraints', async () => {
+    const asked: string[][] = [];
+    Sinon.stub(Prompt, 'parameters').callsFake(async (questions) => {
+        asked.push(namesOf(questions));
+        return new Map([['GitSha', 'abc1234'], ['Added', 'typed']]);
+    });
+
+    try {
+        const context = new CommandContext(client, opts, { reuseParameters: true }, 'testing', []);
+        const full = body();
+        (full.Parameters as Record<string, unknown>).GitSha = { Type: 'String', AllowedPattern: '^[0-9a-f]{7}$' };
+        (full.Parameters as Record<string, unknown>).Secret = { Type: 'String', NoEcho: true, MinLength: 8 };
+        context.newTemplate = new Template(full);
+        const stack = stackValues();
+        stack.set('Secret', '****');
+        context.oldTemplate.parameters = stack;
+
+        await Operations.promptParameters(context);
+
+        assert.deepEqual(asked, [['GitSha', 'Added']], 'the value failing AllowedPattern is asked again; the masked NoEcho value is not validated');
+        assert.equal(context.newTemplate.parameters.get('GitSha'), 'abc1234');
+        assert.equal(context.newTemplate.parameters.get('Secret'), '****', 'the masked value stands and travels as UsePreviousValue');
+        assert.deepEqual(context.changesetParameters?.find((parameter) => parameter.ParameterKey === 'Secret'), { ParameterKey: 'Secret', UsePreviousValue: true });
     } catch (err) {
         assert.ifError(err);
     }

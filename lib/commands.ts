@@ -34,14 +34,7 @@ export interface CommandOptions {
 export interface CommandOverrides {
     parameters?: Map<string, string>;
     driftAware?: boolean;
-    /**
-     * Take every parameter the existing stack already has a value for from
-     * the stack (and from `parameters`) without prompting; prompt only for
-     * parameters the stack does not know, and for parameters whose known
-     * value is no longer among the template's AllowedValues. For a deploy
-     * that changes only the code, the parameter phase then asks nothing
-     * and the parameter diff shows only what the caller overrode.
-     */
+    /** Reuse known values (stack or saved config, plus `parameters`); prompt only for unknown or now-invalid ones */
     reuseParameters?: boolean;
 }
 
@@ -372,15 +365,13 @@ class Operations {
             parameters
         );
 
-        // reuseParameters: a known value (the stack's, or an override) is
-        // the answer; the user is asked only what nobody knows yet, or
-        // what the template no longer allows.
         const reused = new Map<string, string>();
         if (context.reuseParameters) {
             questions = questions.filter((question) => {
                 const value = parameters.get(question.name);
                 if (value === undefined) return true;
                 if (question.choices && !question.choices.includes(value)) return true;
+                if (question.type !== 'password' && !question.validate(value)) return true;
                 reused.set(question.name, value);
                 return false;
             });
@@ -390,7 +381,6 @@ class Operations {
             ? await Prompt.parameters(questions)
             : new Map<string, string>();
 
-        // Template order, whichever way each value arrived.
         context.newTemplate.parameters = new Map(
             Object.keys(context.newTemplate.body.Parameters || {}).map((name) => [
                 name,

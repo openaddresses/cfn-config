@@ -34,6 +34,8 @@ export interface CommandOptions {
 export interface CommandOverrides {
     parameters?: Map<string, string>;
     driftAware?: boolean;
+    /** Reuse known values (stack or saved config, plus `parameters`); prompt only for unknown or now-invalid ones */
+    reuseParameters?: boolean;
 }
 
 interface CommandDiffs {
@@ -250,6 +252,7 @@ class CommandContext {
     diffs: CommandDiffs;
     description: string;
     driftAware: boolean;
+    reuseParameters: boolean;
     saveName?: string;
     configNames?: string[];
     configName?: string;
@@ -290,6 +293,7 @@ class CommandContext {
         }
 
         this.driftAware = overrides.driftAware || false;
+        this.reuseParameters = overrides.reuseParameters || false;
 
         this.operations = operations;
     }
@@ -356,14 +360,33 @@ class Operations {
 
         const parameters = new Map([...context.oldTemplate.parameters, ...context.overrides.parameters]);
 
-        const questions = template.questions(
+        let questions = template.questions(
             context.newTemplate,
             parameters
         );
 
-        const answers = await Prompt.parameters(questions);
+        const reused = new Map<string, string>();
+        if (context.reuseParameters) {
+            questions = questions.filter((question) => {
+                const value = parameters.get(question.name);
+                if (value === undefined) return true;
+                if (question.choices && !question.choices.includes(value)) return true;
+                if (question.type !== 'password' && !question.validate(value)) return true;
+                reused.set(question.name, value);
+                return false;
+            });
+        }
 
-        context.newTemplate.parameters = answers;
+        const answers = questions.length
+            ? await Prompt.parameters(questions)
+            : new Map<string, string>();
+
+        context.newTemplate.parameters = new Map(
+            Object.keys(context.newTemplate.body.Parameters || {}).map((name) => [
+                name,
+                reused.has(name) ? reused.get(name)! : answers.get(name)!
+            ])
+        );
         context.changesetParameters = changesetParameters(
             context.oldTemplate.parameters,
             context.newTemplate.parameters,

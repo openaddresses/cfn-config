@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file. For change 
 
 ## Unreleased
 
+## 9.1.0 - 2026-10-30
+
 - :tada: Add `reuseParameters` override to `create` and `update`: parameters the stack already has a value for are taken from the stack without prompting; only parameters the stack does not know, or whose known value is no longer allowed, are asked. Lets a code-only deploy skip the parameter prompts without skipping the parameter, template and changeset confirmations
 
 ## 9.0.0 - 2026-10-30
